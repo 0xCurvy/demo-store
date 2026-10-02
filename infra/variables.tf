@@ -26,6 +26,7 @@ variable "environments" {
     # receiving keys let people pay the shop, nothing more. chain_id and aggregator_address are the overrides for
     # a staging stack; empty, the SDK uses the Curvy environment's own contracts.
     curvy_environment  = string
+    curvy_api_url      = string
     checkout_url       = string
     receiving_keys     = string
     chain_id           = string
@@ -40,6 +41,7 @@ variable "environments" {
       workers_dev = false
       # Curvy production. The receiving keys come from Payments setup at app.curvy.box; fill them in to go live.
       curvy_environment  = "mainnet"
+      curvy_api_url      = "https://api.curvy.box"
       checkout_url       = "https://app.curvy.box/checkout"
       receiving_keys     = ""
       chain_id           = ""
@@ -54,6 +56,7 @@ variable "environments" {
       # Curvy staging: its own aggregator on Arbitrum One and the checkout at app.curvy.dev, paying the account
       # brutalism.staging-curvy.name (from that stack's Payments setup).
       curvy_environment  = "mainnet"
+      curvy_api_url      = "https://api.curvy.dev"
       checkout_url       = "https://app.curvy.dev/checkout"
       receiving_keys     = "01Q1JL5zpy8ahBJBPsR44r-x-L5woOjJrC_uUM6gOplEIAzrEcdEidhpmDLBwMwdnfFqyuv9-7u8Am-8fjaNE9ciD4Li4fTipAGT3_Ia3HekjJublxYo6DT-J3sFO3rZ4x0wDYEeY3RMGKqiW1raysrxXL3swj6yyCUk5c57HRTOexz_oY82Nl57Rqmm8czsovbuxlxQLNn4u1R7ban_DF4BghFCsn9nT-QuFo-mkOBwvbXvdR5taKNQwr66ns2KxC35isNMilsQ"
       chain_id           = "42161"

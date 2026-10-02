@@ -101,7 +101,7 @@ export const address = text("a 0x… contract address")
   .transform((value): Address => getAddress(value));
 
 /** A bare origin such as https://shop.example.com: scheme and host, no path or trailing slash. */
-export const origin = text("this shop's own origin, such as https://shop.example.com").refine(
+export const origin = text("a bare origin, such as https://shop.example.com").refine(
   (value) => {
     const url = parseUrl(value);
 

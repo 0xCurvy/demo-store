@@ -38,6 +38,9 @@ export interface ShopSettings {
   aggregatorAddress: Address;
   checkoutUrl: string;
   merchantOrigin: string;
+  /** Curvy's API gateway for the stack, which also proxies the chain's JSON-RPC at /rpc/<chainId>. */
+  curvyApiUrl: string;
+  /** RPC_URL, or the gateway's proxy for the shop's chain when none is set. */
   rpcUrl: string;
   confirmations: number;
   paidWhen: PaidWhen;
@@ -80,7 +83,10 @@ const shopSchema = z.object({
   TOKENS: field.list.optional(),
   CHECKOUT_URL: field.pageUrl("Curvy's checkout page, such as https://app.curvy.box/checkout"),
   MERCHANT_ORIGIN: field.origin,
-  RPC_URL: field.rpcUrl,
+  // The stack's API gateway: https://api.curvy.box for production, https://api.curvy.dev for staging.
+  CURVY_API_URL: field.origin.default("https://api.curvy.box"),
+  // Your own RPC endpoint. Unset, the shop reads the chain through the gateway's proxy, /rpc/<chainId>.
+  RPC_URL: field.rpcUrl.optional(),
   CONFIRMATIONS: field.positiveInteger.default(12),
   PAID_WHEN: z
     .enum(["shielded", "committed"], { error: "must be shielded or committed" })
@@ -189,7 +195,8 @@ export function readShopSettings(env: Env): Settings<ShopSettings> {
     ...resolved,
     checkoutUrl: values.CHECKOUT_URL,
     merchantOrigin: values.MERCHANT_ORIGIN,
-    rpcUrl: values.RPC_URL,
+    curvyApiUrl: values.CURVY_API_URL,
+    rpcUrl: values.RPC_URL ?? `${values.CURVY_API_URL}/rpc/${resolved.chainId}`,
     confirmations: values.CONFIRMATIONS,
     paidWhen: values.PAID_WHEN,
     completePath: DEFAULT_CHECKOUT_COMPLETE_PATH,

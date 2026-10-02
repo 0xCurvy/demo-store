@@ -41,7 +41,6 @@ describe("shop settings", () => {
       "MERCHANT_INTENT_SIGNING_KEY",
       "CHECKOUT_URL",
       "MERCHANT_ORIGIN",
-      "RPC_URL",
     ]);
   });
 
@@ -69,6 +68,22 @@ describe("shop settings", () => {
     `);
 
     expect(result.problems.join("\n")).not.toContain("secret-api-key");
+  });
+
+  it("reads the chain through Curvy's gateway unless RPC_URL names an endpoint", async () => {
+    const byDefault = readShopSettings(await testEnv({ RPC_URL: undefined }));
+
+    expect(byDefault.ok && byDefault.value.rpcUrl).toBe("https://api.curvy.box/rpc/42161");
+
+    const staging = readShopSettings(
+      await testEnv({ RPC_URL: undefined, CURVY_API_URL: "https://api.curvy.dev" }),
+    );
+
+    expect(staging.ok && staging.value.rpcUrl).toBe("https://api.curvy.dev/rpc/42161");
+
+    const own = readShopSettings(await testEnv({ RPC_URL: "https://rpc.example/v2/key" }));
+
+    expect(own.ok && own.value.rpcUrl).toBe("https://rpc.example/v2/key");
   });
 
   it("takes a staging stack's chain and aggregator as overrides", async () => {

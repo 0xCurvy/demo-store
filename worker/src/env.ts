@@ -13,6 +13,7 @@ export interface Env {
   AGGREGATOR_ADDRESS?: string;
   TOKENS?: string;
   CHECKOUT_URL?: string;
+  CURVY_API_URL?: string;
   RPC_URL?: string;
   ADMIN_TOKEN?: string;
   CONFIRMATIONS?: string;

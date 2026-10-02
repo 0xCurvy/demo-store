@@ -89,18 +89,19 @@ web/src/
 
 `.env.example` explains every value. The ones that matter most:
 
-| Variable                                          | What it is                                                                                             |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `CURVY_PAYMENTS_PUBLIC_KEY`                       | Your public key for payments, from Payments setup. It lets people pay you; it cannot spend your funds. |
-| `MERCHANT_INTENT_SIGNING_KEY`                     | Secret. Signs checkout requests. Anyone holding it can redirect future payments.                       |
-| `CHAIN_ID`, `TOKEN_ADDRESS`, `AGGREGATOR_ADDRESS` | The network and token, from Payments setup.                                                            |
-| `CHECKOUT_URL`                                    | Curvy's checkout page.                                                                                 |
-| `MERCHANT_ORIGIN`                                 | This shop's own origin. Must be exactly where the shop is served.                                      |
-| `RPC_URL`                                         | Your RPC endpoint. It stays on the server.                                                             |
-| `CONFIRMATIONS`, `PAID_WHEN`                      | When an order counts as paid.                                                                          |
-| `ADMIN_TOKEN`                                     | Opens the admin page.                                                                                  |
-| `WALLPAPERS_DIR`                                  | The folder with the 4K files (default `wallpapers`). They are not in the repository.                   |
-| `CLIENT_IP_HEADER`                                | Behind a proxy, the header it puts the visitor's address in (`X-Real-IP` on Railway).                  |
+| Variable                                          | What it is                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `CURVY_PAYMENTS_PUBLIC_KEY`                       | Your public key for payments, from Payments setup. It lets people pay you; it cannot spend your funds.  |
+| `MERCHANT_INTENT_SIGNING_KEY`                     | Secret. Signs checkout requests. Anyone holding it can redirect future payments.                        |
+| `CHAIN_ID`, `TOKEN_ADDRESS`, `AGGREGATOR_ADDRESS` | The network and token, from Payments setup.                                                             |
+| `CHECKOUT_URL`                                    | Curvy's checkout page.                                                                                  |
+| `MERCHANT_ORIGIN`                                 | This shop's own origin. Must be exactly where the shop is served.                                       |
+| `CURVY_API_URL`                                   | Curvy's API gateway: `https://api.curvy.box` (production) or `https://api.curvy.dev` (staging).         |
+| `RPC_URL`                                         | Optional. Your own RPC endpoint; unset, the chain is read through the gateway's `/rpc/<chainId>` proxy. |
+| `CONFIRMATIONS`, `PAID_WHEN`                      | When an order counts as paid.                                                                           |
+| `ADMIN_TOKEN`                                     | Opens the admin page.                                                                                   |
+| `WALLPAPERS_DIR`                                  | The folder with the 4K files (default `wallpapers`). They are not in the repository.                    |
+| `CLIENT_IP_HEADER`                                | Behind a proxy, the header it puts the visitor's address in (`X-Real-IP` on Railway).                   |
 
 ## On Cloudflare
 
@@ -133,7 +134,7 @@ pnpm start
 - Keep `MERCHANT_INTENT_SIGNING_KEY` in a secret store, never in the repository.
 - Replace the JSON file store with your database. `storage/order-repository.ts` is the interface to implement.
 - Ship goods in `orders/fulfilment.ts`. It runs exactly once per order.
-- Use your own RPC endpoint with archive access for older blocks.
+- Consider your own RPC endpoint (`RPC_URL`) with archive access and your own rate limits; the gateway proxy is shared.
 - Behind a proxy, set `CLIENT_IP_HEADER`, so rate limits count each visitor rather than the proxy.
 
 The shop limits each visitor address: 10 new payments per 10 minutes, 30 payment checks and 120 API calls a minute. It keeps at most `MAX_OPEN_ORDERS` unpaid orders open, and one order at most 10 payment attempts. The counts live in memory, so run one server process, or give `express-rate-limit` a shared store in `http/rate-limits.ts`.

@@ -4,7 +4,7 @@
 # never prints one:
 #   CLOUDFLARE_API_TOKEN            from the environment (direnv loads infra/.envrc)
 #   CLOUDFLARE_ACCOUNT_ID           from worker/wrangler.toml, as Terraform wrote it
-#   MERCHANT_INTENT_SIGNING_KEY, RPC_URL, ADMIN_TOKEN
+#   MERCHANT_INTENT_SIGNING_KEY, ADMIN_TOKEN, and RPC_URL when set
 #                                   from .env (the same values the Node server uses)
 # The Curvy stack, receiving keys and network are public and come from Terraform via wrangler.toml.
 # Production gets the .env values. Development gets the same, except its own freshly generated signing key, so a
@@ -49,7 +49,7 @@ seed_environment() { # seed_environment <environment> <env file> <signing key>
   rpc_url="$(value "$file" RPC_URL)"
   admin_token="$(value "$file" ADMIN_TOKEN)"
 
-  for pair in "RPC_URL=$rpc_url" "ADMIN_TOKEN=$admin_token" "MERCHANT_INTENT_SIGNING_KEY=$signing_key"; do
+  for pair in "ADMIN_TOKEN=$admin_token" "MERCHANT_INTENT_SIGNING_KEY=$signing_key"; do
     require "${pair%%=*}" "${pair#*=}"
   done
 
@@ -57,7 +57,12 @@ seed_environment() { # seed_environment <environment> <env file> <signing key>
   gh api -X PUT "repos/$repo/environments/$environment" >/dev/null
 
   gh secret set MERCHANT_INTENT_SIGNING_KEY --repo "$repo" --env "$environment" --body "$signing_key"
-  gh secret set RPC_URL --repo "$repo" --env "$environment" --body "$rpc_url"
+  # Without RPC_URL the shop reads the chain through Curvy's gateway proxy; an own endpoint is optional.
+  if [ -n "$rpc_url" ]; then
+    gh secret set RPC_URL --repo "$repo" --env "$environment" --body "$rpc_url"
+  else
+    gh secret delete RPC_URL --repo "$repo" --env "$environment" >/dev/null 2>&1 || true
+  fi
   gh secret set ADMIN_TOKEN --repo "$repo" --env "$environment" --body "$admin_token"
 }
 

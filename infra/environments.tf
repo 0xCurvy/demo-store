@@ -35,6 +35,7 @@ resource "local_file" "wrangler" {
         cron               = env.cron
         workers_dev        = env.workers_dev
         curvy_environment  = env.curvy_environment
+        curvy_api_url      = env.curvy_api_url
         checkout_url       = env.checkout_url
         receiving_keys     = env.receiving_keys
         chain_id           = env.chain_id

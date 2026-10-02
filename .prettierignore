@@ -6,3 +6,5 @@ pnpm-lock.yaml
 .wrangler
 .terraform
 wallpapers
+*.tfstate
+*.tfstate.*

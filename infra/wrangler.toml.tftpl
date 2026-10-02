@@ -22,12 +22,13 @@ enabled = true
 workers_dev = ${env.workers_dev}
 routes = [{ pattern = "${env.host}", custom_domain = true }]
 
-# Public settings; an empty value counts as unset. The secrets (signing key, RPC URL, admin token) are set on the
-# Worker by the deploy workflow from GitHub, never here.
+# Public settings; an empty value counts as unset. The secrets (signing key, admin token, and RPC_URL only when the
+# shop uses its own endpoint instead of the gateway's /rpc proxy) are set on the Worker by the deploy workflow.
 [env.${name}.vars]
 ENVIRONMENT = "${name}"
 MERCHANT_ORIGIN = "https://${env.host}"
 CURVY_ENVIRONMENT = "${env.curvy_environment}"
+CURVY_API_URL = "${env.curvy_api_url}"
 CHECKOUT_URL = "${env.checkout_url}"
 CURVY_PAYMENTS_PUBLIC_KEY = "${env.receiving_keys}"
 CHAIN_ID = "${env.chain_id}"

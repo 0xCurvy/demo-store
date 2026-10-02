@@ -21,12 +21,13 @@ enabled = true
 workers_dev = true
 routes = [{ pattern = "dev.brutalism.store", custom_domain = true }]
 
-# Public settings; an empty value counts as unset. The secrets (signing key, RPC URL, admin token) are set on the
-# Worker by the deploy workflow from GitHub, never here.
+# Public settings; an empty value counts as unset. The secrets (signing key, admin token, and RPC_URL only when the
+# shop uses its own endpoint instead of the gateway's /rpc proxy) are set on the Worker by the deploy workflow.
 [env.development.vars]
 ENVIRONMENT = "development"
 MERCHANT_ORIGIN = "https://dev.brutalism.store"
 CURVY_ENVIRONMENT = "mainnet"
+CURVY_API_URL = "https://api.curvy.dev"
 CHECKOUT_URL = "https://app.curvy.dev/checkout"
 CURVY_PAYMENTS_PUBLIC_KEY = "01Q1JL5zpy8ahBJBPsR44r-x-L5woOjJrC_uUM6gOplEIAzrEcdEidhpmDLBwMwdnfFqyuv9-7u8Am-8fjaNE9ciD4Li4fTipAGT3_Ia3HekjJublxYo6DT-J3sFO3rZ4x0wDYEeY3RMGKqiW1raysrxXL3swj6yyCUk5c57HRTOexz_oY82Nl57Rqmm8czsovbuxlxQLNn4u1R7ban_DF4BghFCsn9nT-QuFo-mkOBwvbXvdR5taKNQwr66ns2KxC35isNMilsQ"
 CHAIN_ID = "42161"
@@ -50,12 +51,13 @@ crons = ["* * * * *"]
 workers_dev = false
 routes = [{ pattern = "brutalism.store", custom_domain = true }]
 
-# Public settings; an empty value counts as unset. The secrets (signing key, RPC URL, admin token) are set on the
-# Worker by the deploy workflow from GitHub, never here.
+# Public settings; an empty value counts as unset. The secrets (signing key, admin token, and RPC_URL only when the
+# shop uses its own endpoint instead of the gateway's /rpc proxy) are set on the Worker by the deploy workflow.
 [env.production.vars]
 ENVIRONMENT = "production"
 MERCHANT_ORIGIN = "https://brutalism.store"
 CURVY_ENVIRONMENT = "mainnet"
+CURVY_API_URL = "https://api.curvy.box"
 CHECKOUT_URL = "https://app.curvy.box/checkout"
 CURVY_PAYMENTS_PUBLIC_KEY = ""
 CHAIN_ID = ""

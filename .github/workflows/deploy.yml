@@ -52,6 +52,7 @@ jobs:
           environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
           command: deploy
           # The Curvy stack, receiving keys and network are public and live in wrangler.toml; only these are secrets.
+          # RPC_URL is optional: without it the shop reads the chain through Curvy's gateway proxy.
           secrets: |
             MERCHANT_INTENT_SIGNING_KEY
             RPC_URL

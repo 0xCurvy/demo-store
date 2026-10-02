@@ -46,8 +46,8 @@ infra/upload-wallpapers.sh production
 
 The deploy workflow reads them from two GitHub environments, `production` and `development`, so each has its own
 keys. `infra/seed-secrets.sh` sets all of them from your local `.env` and the token in your environment, and never
-prints a value. Fill `.env` first (`RPC_URL` is your own endpoint, `ADMIN_TOKEN` any long random string, the signing key from
-`pnpm create-signer`). The Curvy stack, receiving keys and network are public and come from Terraform via
+prints a value. Fill `.env` first (`ADMIN_TOKEN` any long random string, the signing key from `pnpm create-signer`; `RPC_URL`
+only if you want your own endpoint instead of Curvy's gateway proxy). The Curvy stack, receiving keys and network are public and come from Terraform via
 `wrangler.toml`; change them in `variables.tf`. Then:
 
 ```sh
