@@ -11,7 +11,7 @@
     "migrate:local": "wrangler d1 migrations apply ORDERS --local --env development"
   },
   "dependencies": {
-    "@0xcurvy/payments-sdk": "0.2.0-rc.1",
+    "@0xcurvy/payments-sdk": "0.2.0-rc.2",
     "@0xcurvy/rs-core-wasm": "0.1.0-rc.4",
     "hono": "4.13.12",
     "viem": "2.57.0",

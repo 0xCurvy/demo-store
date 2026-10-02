@@ -54,7 +54,7 @@ describe("creating an order", () => {
     payments.chainId = async () => 1;
 
     await expect(shop.orders.createOrder("01-beograd-genex")).rejects.toThrow(
-      "RPC_URL serves chain 1, but CHAIN_ID is 42161",
+      "RPC_URL serves chain 1, but the shop takes payments on chain 42161",
     );
   });
 });

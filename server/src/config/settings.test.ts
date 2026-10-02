@@ -13,9 +13,12 @@ describe("shop settings", () => {
 
     if (!result.ok) return;
 
+    // Mainnet resolves to Curvy's Arbitrum One contracts and USDC first.
     expect(result.value).toMatchObject({
+      sdk: { environment: "mainnet" },
       chainId: 42161,
       tokenAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      aggregatorAddress: "0xE51924cEF003a654EC9735c4d97f5D4862cBcbB1",
       confirmations: 12,
       paidWhen: "shielded",
       completePath: "/checkout/complete",
@@ -36,9 +39,6 @@ describe("shop settings", () => {
     expect(names).toEqual([
       "CURVY_PAYMENTS_PUBLIC_KEY",
       "MERCHANT_INTENT_SIGNING_KEY",
-      "CHAIN_ID",
-      "TOKEN_ADDRESS",
-      "AGGREGATOR_ADDRESS",
       "CHECKOUT_URL",
       "MERCHANT_ORIGIN",
       "RPC_URL",
@@ -69,6 +69,22 @@ describe("shop settings", () => {
     `);
 
     expect(result.problems.join("\n")).not.toContain("secret-api-key");
+  });
+
+  it("takes a staging stack's chain and aggregator as overrides", async () => {
+    const result = readShopSettings(
+      await testEnv({
+        CHAIN_ID: "42161",
+        AGGREGATOR_ADDRESS: "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953",
+        TOKENS: "USDC",
+      }),
+    );
+
+    expect(result.ok && result.value.aggregatorAddress).toBe(
+      "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953",
+    );
+
+    expect(result.ok && result.value.sdk.network?.chainId).toBe(42161);
   });
 
   it("accepts plain http only for this machine", async () => {

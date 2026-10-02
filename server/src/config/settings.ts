@@ -3,7 +3,7 @@
  * each variable. Problems are reported by variable name; secrets and the RPC URL are never echoed.
  */
 import { DEFAULT_CHECKOUT_COMPLETE_PATH } from "@0xcurvy/payments-sdk";
-import type { PaidWhen } from "@0xcurvy/payments-sdk/merchant";
+import { initialize, type PaidWhen, type PaymentSDKConfig } from "@0xcurvy/payments-sdk/merchant";
 import type { Address, Hex } from "viem";
 import { privateKeyToAddress } from "viem/accounts";
 import { z } from "zod";
@@ -21,12 +21,20 @@ export interface SignerSettings {
   notAfter: string;
 }
 
-/** How the shop takes payments: the receiving account, the network and Curvy's checkout page. */
+/**
+ * How the shop takes payments: the receiving account, the Curvy environment and checkout page, and the network the
+ * SDK resolves from them (Arbitrum One on mainnet, Ethereum Sepolia on testnet, or the overrides for a staging stack).
+ */
 export interface ShopSettings {
   receivingKeys: string;
   signingKey: Hex;
+  /** What the SDK's `initialize` takes: the environment, overrides and tokens as configured. */
+  sdk: Pick<PaymentSDKConfig, "environment" | "network" | "tokens">;
+  /** Resolved by the SDK from `sdk`: the chain requests are made for. */
   chainId: number;
+  /** Resolved by the SDK: the token the shop prices in (the first it takes). */
   tokenAddress: Address;
+  /** Resolved by the SDK: the aggregator payments are checked against. */
   aggregatorAddress: Address;
   checkoutUrl: string;
   merchantOrigin: string;
@@ -62,10 +70,15 @@ const signerSchema = z.object({
 const shopSchema = z.object({
   CURVY_PAYMENTS_PUBLIC_KEY: field.receivingKeys,
   MERCHANT_INTENT_SIGNING_KEY: field.signingKey,
-  CHAIN_ID: field.requiredInteger("the chain id of the network, such as 11155111"),
-  TOKEN_ADDRESS: field.address,
-  AGGREGATOR_ADDRESS: field.address,
-  CHECKOUT_URL: field.pageUrl("Curvy's checkout page, such as https://app.curvy.dev/checkout"),
+  CURVY_ENVIRONMENT: z
+    .enum(["mainnet", "testnet"], { error: "must be mainnet or testnet" })
+    .default("mainnet"),
+  // A staging or local Curvy stack: name its chain and aggregator. Unset, the environment's own contracts apply.
+  CHAIN_ID: field.positiveInteger.optional(),
+  AGGREGATOR_ADDRESS: field.address.optional(),
+  // Symbols or addresses the shop takes, the first preferred. Unset, all Curvy takes on the network.
+  TOKENS: field.list.optional(),
+  CHECKOUT_URL: field.pageUrl("Curvy's checkout page, such as https://app.curvy.box/checkout"),
   MERCHANT_ORIGIN: field.origin,
   RPC_URL: field.rpcUrl,
   CONFIRMATIONS: field.positiveInteger.default(12),
@@ -124,12 +137,56 @@ export function readSignerSettings(env: Env, now = Date.now()): Settings<SignerS
 }
 
 export function readShopSettings(env: Env): Settings<ShopSettings> {
-  return read(shopSchema, env, (values) => ({
+  const parsed = read(shopSchema, env, (values) => values);
+
+  if (!parsed.ok) return parsed;
+
+  const values = parsed.value;
+
+  const sdk: ShopSettings["sdk"] = {
+    environment: values.CURVY_ENVIRONMENT,
+    ...(values.CHAIN_ID === undefined
+      ? {}
+      : { network: { chainId: values.CHAIN_ID, aggregatorAddress: values.AGGREGATOR_ADDRESS } }),
+    ...(values.TOKENS === undefined ? {} : { tokens: values.TOKENS }),
+  };
+
+  // The SDK resolves the network from the environment and the overrides, and refuses what it cannot serve.
+  let resolved: { chainId: number; tokenAddress: Address; aggregatorAddress: Address };
+
+  try {
+    const instance = initialize({
+      ...sdk,
+      receivingKeys: values.CURVY_PAYMENTS_PUBLIC_KEY,
+      merchantOrigin: values.MERCHANT_ORIGIN,
+      confirmations: values.CONFIRMATIONS,
+      paidWhen: values.PAID_WHEN,
+      ttlSeconds: values.PAYMENT_TTL_SECONDS,
+      checkoutCompletePath: DEFAULT_CHECKOUT_COMPLETE_PATH,
+    });
+
+    const [tokenAddress] = instance.tokens;
+
+    if (!tokenAddress) throw new Error("TOKENS names no token Curvy takes on this network");
+
+    if (!instance.aggregatorAddress) {
+      throw new Error("AGGREGATOR_ADDRESS is required on a chain the SDK does not know");
+    }
+
+    resolved = {
+      chainId: instance.chainId,
+      tokenAddress,
+      aggregatorAddress: instance.aggregatorAddress,
+    };
+  } catch (error) {
+    return { ok: false, problems: [error instanceof Error ? error.message : String(error)] };
+  }
+
+  return read(shopSchema, env, () => ({
     receivingKeys: values.CURVY_PAYMENTS_PUBLIC_KEY,
     signingKey: values.MERCHANT_INTENT_SIGNING_KEY,
-    chainId: values.CHAIN_ID,
-    tokenAddress: values.TOKEN_ADDRESS,
-    aggregatorAddress: values.AGGREGATOR_ADDRESS,
+    sdk,
+    ...resolved,
     checkoutUrl: values.CHECKOUT_URL,
     merchantOrigin: values.MERCHANT_ORIGIN,
     rpcUrl: values.RPC_URL,

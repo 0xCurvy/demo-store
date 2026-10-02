@@ -21,15 +21,17 @@ enabled = true
 workers_dev = true
 routes = [{ pattern = "dev.brutalism.store", custom_domain = true }]
 
-# Public settings. The secrets (receiving keys, signing key, RPC URL, admin token) are set on the Worker by the
-# deploy workflow from GitHub, never here.
+# Public settings; an empty value counts as unset. The secrets (signing key, RPC URL, admin token) are set on the
+# Worker by the deploy workflow from GitHub, never here.
 [env.development.vars]
 ENVIRONMENT = "development"
 MERCHANT_ORIGIN = "https://dev.brutalism.store"
+CURVY_ENVIRONMENT = "mainnet"
+CHECKOUT_URL = "https://app.curvy.dev/checkout"
+CURVY_PAYMENTS_PUBLIC_KEY = "01Q1JL5zpy8ahBJBPsR44r-x-L5woOjJrC_uUM6gOplEIAzrEcdEidhpmDLBwMwdnfFqyuv9-7u8Am-8fjaNE9ciD4Li4fTipAGT3_Ia3HekjJublxYo6DT-J3sFO3rZ4x0wDYEeY3RMGKqiW1raysrxXL3swj6yyCUk5c57HRTOexz_oY82Nl57Rqmm8czsovbuxlxQLNn4u1R7ban_DF4BghFCsn9nT-QuFo-mkOBwvbXvdR5taKNQwr66ns2KxC35isNMilsQ"
 CHAIN_ID = "42161"
-TOKEN_ADDRESS = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
-AGGREGATOR_ADDRESS = "0xe51924cef003a654ec9735c4d97f5d4862cbcbb1"
-CHECKOUT_URL = "https://app.curvy.box/checkout"
+AGGREGATOR_ADDRESS = "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953"
+TOKENS = "USDC"
 
 [[env.development.d1_databases]]
 binding = "ORDERS"
@@ -48,15 +50,17 @@ crons = ["* * * * *"]
 workers_dev = false
 routes = [{ pattern = "brutalism.store", custom_domain = true }]
 
-# Public settings. The secrets (receiving keys, signing key, RPC URL, admin token) are set on the Worker by the
-# deploy workflow from GitHub, never here.
+# Public settings; an empty value counts as unset. The secrets (signing key, RPC URL, admin token) are set on the
+# Worker by the deploy workflow from GitHub, never here.
 [env.production.vars]
 ENVIRONMENT = "production"
 MERCHANT_ORIGIN = "https://brutalism.store"
-CHAIN_ID = "42161"
-TOKEN_ADDRESS = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
-AGGREGATOR_ADDRESS = "0xe51924cef003a654ec9735c4d97f5d4862cbcbb1"
+CURVY_ENVIRONMENT = "mainnet"
 CHECKOUT_URL = "https://app.curvy.box/checkout"
+CURVY_PAYMENTS_PUBLIC_KEY = ""
+CHAIN_ID = ""
+AGGREGATOR_ADDRESS = ""
+TOKENS = "USDC"
 
 [[env.production.d1_databases]]
 binding = "ORDERS"

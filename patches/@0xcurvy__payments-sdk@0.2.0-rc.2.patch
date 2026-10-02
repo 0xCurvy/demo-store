@@ -1,0 +1,64 @@
+diff --git a/dist/_cjs/merchant/index.cjs b/dist/_cjs/merchant/index.cjs
+index 821a3527a1ee274a9e161f8b17c2c169a2040191..6ff5e3631a99eae3dac95c448c27af0e2a703dc8 100644
+--- a/dist/_cjs/merchant/index.cjs
++++ b/dist/_cjs/merchant/index.cjs
+@@ -774,7 +774,10 @@ async function readPackagedWasm() {
+ }
+ async function ensureRustCore() {
+   if (!initialization) {
+-    initialization = readPackagedWasm().then((bytes) => __wbg_init({ module_or_path: bytes })).then(() => void 0).catch((error) => {
++    // Outside Node (Cloudflare Workers, browsers) the host pre-initialises the core with the WASM module; the glue
++    // then returns at once from init. Only Node reads the packaged file from disk.
++    const canReadDisk = typeof process !== "undefined" && typeof process.getBuiltinModule === "function" && !(typeof navigator !== "undefined" && typeof navigator.userAgent === "string" && navigator.userAgent.includes("Cloudflare"));
++    initialization = (canReadDisk ? readPackagedWasm().then((bytes) => __wbg_init({ module_or_path: bytes })) : Promise.resolve(__wbg_init())).then(() => void 0).catch((error) => {
+       initialization = void 0;
+       throw error;
+     });
+diff --git a/dist/_cjs/x402/merchant/index.cjs b/dist/_cjs/x402/merchant/index.cjs
+index 20c2573696f6b224b1fdd343a0e0041db1d4bb32..79f71034ba085878dd2e0d9e5d60eef8b3b1e8b3 100644
+--- a/dist/_cjs/x402/merchant/index.cjs
++++ b/dist/_cjs/x402/merchant/index.cjs
+@@ -4510,7 +4510,10 @@ async function readPackagedWasm() {
+ }
+ async function ensureRustCore() {
+   if (!initialization) {
+-    initialization = readPackagedWasm().then((bytes) => __wbg_init({ module_or_path: bytes })).then(() => void 0).catch((error) => {
++    // Outside Node (Cloudflare Workers, browsers) the host pre-initialises the core with the WASM module; the glue
++    // then returns at once from init. Only Node reads the packaged file from disk.
++    const canReadDisk = typeof process !== "undefined" && typeof process.getBuiltinModule === "function" && !(typeof navigator !== "undefined" && typeof navigator.userAgent === "string" && navigator.userAgent.includes("Cloudflare"));
++    initialization = (canReadDisk ? readPackagedWasm().then((bytes) => __wbg_init({ module_or_path: bytes })) : Promise.resolve(__wbg_init())).then(() => void 0).catch((error) => {
+       initialization = void 0;
+       throw error;
+     });
+diff --git a/dist/_esm/merchant/index.js b/dist/_esm/merchant/index.js
+index 3f7dbaeb601da224c8f833881a1b4ed4a2c0f4d6..62633fc391c869b5cd2e207e4507f0801c09c702 100644
+--- a/dist/_esm/merchant/index.js
++++ b/dist/_esm/merchant/index.js
+@@ -205,7 +205,10 @@ async function readPackagedWasm() {
+ }
+ async function ensureRustCore() {
+   if (!initialization) {
+-    initialization = readPackagedWasm().then((bytes) => initRustCore({ module_or_path: bytes })).then(() => void 0).catch((error) => {
++    // Outside Node (Cloudflare Workers, browsers) the host pre-initialises the core with the WASM module; the glue
++    // then returns at once from init. Only Node reads the packaged file from disk.
++    const canReadDisk = typeof process !== "undefined" && typeof process.getBuiltinModule === "function" && !(typeof navigator !== "undefined" && typeof navigator.userAgent === "string" && navigator.userAgent.includes("Cloudflare"));
++    initialization = (canReadDisk ? readPackagedWasm().then((bytes) => initRustCore({ module_or_path: bytes })) : Promise.resolve(initRustCore())).then(() => void 0).catch((error) => {
+       initialization = void 0;
+       throw error;
+     });
+diff --git a/dist/_esm/x402/merchant/index.js b/dist/_esm/x402/merchant/index.js
+index d6d5d8972c06b33cf10003007ed10c1aee69d4af..570d7d39c0bfc46076f3ce2666c5bf69fc22ecec 100644
+--- a/dist/_esm/x402/merchant/index.js
++++ b/dist/_esm/x402/merchant/index.js
+@@ -3941,7 +3941,10 @@ async function readPackagedWasm() {
+ }
+ async function ensureRustCore() {
+   if (!initialization) {
+-    initialization = readPackagedWasm().then((bytes) => initRustCore({ module_or_path: bytes })).then(() => void 0).catch((error) => {
++    // Outside Node (Cloudflare Workers, browsers) the host pre-initialises the core with the WASM module; the glue
++    // then returns at once from init. Only Node reads the packaged file from disk.
++    const canReadDisk = typeof process !== "undefined" && typeof process.getBuiltinModule === "function" && !(typeof navigator !== "undefined" && typeof navigator.userAgent === "string" && navigator.userAgent.includes("Cloudflare"));
++    initialization = (canReadDisk ? readPackagedWasm().then((bytes) => initRustCore({ module_or_path: bytes })) : Promise.resolve(initRustCore())).then(() => void 0).catch((error) => {
+       initialization = void 0;
+       throw error;
+     });

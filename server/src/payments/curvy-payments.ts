@@ -12,8 +12,8 @@ export function createCurvyPayments(settings: ShopSettings): Payments {
   });
 
   const sdk = initialize({
+    ...settings.sdk,
     receivingKeys: settings.receivingKeys,
-    chainId: settings.chainId,
     merchantOrigin: settings.merchantOrigin,
     confirmations: settings.confirmations,
     paidWhen: settings.paidWhen,
@@ -45,18 +45,13 @@ export function createCurvyPayments(settings: ShopSettings): Payments {
     token: readToken,
 
     async createSignedPayment(amount, description) {
-      const request = await sdk.createPaymentRequest({ amount, token, description });
+      const request = await sdk.createPaymentRequest({ amount, description });
 
       return signPaymentIntent(request, (typedData) => signer.signTypedData(typedData));
     },
 
     verifyPayment(request, lookup) {
-      return sdk.verifyPayment({
-        publicClient,
-        aggregatorAddress: settings.aggregatorAddress,
-        request,
-        ...lookup,
-      });
+      return sdk.verifyPayment({ publicClient, request, ...lookup });
     },
   };
 }

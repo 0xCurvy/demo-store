@@ -58,7 +58,7 @@ describe("the signer list", () => {
     if (!signer.ok) throw new Error("test signer");
 
     const app = createApp({
-      shop: { ok: false, problems: ["CHAIN_ID is required"] },
+      shop: { ok: false, problems: ["RPC_URL is required"] },
       signerList: { ok: true, value: buildSignerList(signer.value) },
       adminToken: null,
       wallpapersDir: wallpapersDir(),
@@ -69,7 +69,7 @@ describe("the signer list", () => {
 
     expect((await request(app).get("/api/shop")).body).toEqual({
       ready: false,
-      problems: ["CHAIN_ID is required"],
+      problems: ["RPC_URL is required"],
     });
 
     const order = await request(app).post("/api/orders").send({ productId: "01-beograd-genex" });

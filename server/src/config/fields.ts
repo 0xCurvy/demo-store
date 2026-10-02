@@ -126,6 +126,17 @@ export const pageUrl = (hint: string) =>
     )
     .transform((value) => new URL(value).href);
 
+/** A comma-separated list, trimmed, with no empty entries. */
+export const list = z
+  .string()
+  .transform((value) =>
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean),
+  )
+  .refine((items) => items.length > 0, { error: "must list at least one entry" });
+
 export const isoDate = z.iso.datetime({
   offset: true,
   error: "must be an ISO date such as 2027-01-01T00:00:00Z",

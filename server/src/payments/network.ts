@@ -1,5 +1,5 @@
 /**
- * Checks that RPC_URL serves CHAIN_ID before the first payment request, and reads the token once.
+ * Checks that RPC_URL serves the shop's chain before the first payment request, and reads the token once.
  * A request made against the wrong chain would record a scan start block from that other chain.
  */
 import { ShopError } from "../errors.js";
@@ -32,7 +32,7 @@ export function createNetwork(payments: Payments, expectedChainId: number): Netw
       if (chainId !== expectedChainId) {
         throw new ShopError(
           500,
-          `RPC_URL serves chain ${chainId}, but CHAIN_ID is ${expectedChainId}`,
+          `RPC_URL serves chain ${chainId}, but the shop takes payments on chain ${expectedChainId}`,
           "WRONG_CHAIN",
         );
       }

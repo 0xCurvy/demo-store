@@ -34,10 +34,12 @@ resource "local_file" "wrangler" {
         host               = env.host
         cron               = env.cron
         workers_dev        = env.workers_dev
-        chain_id           = env.chain_id
-        token_address      = env.token_address
-        aggregator_address = env.aggregator_address
+        curvy_environment  = env.curvy_environment
         checkout_url       = env.checkout_url
+        receiving_keys     = env.receiving_keys
+        chain_id           = env.chain_id
+        aggregator_address = env.aggregator_address
+        tokens             = env.tokens
         d1_id              = cloudflare_d1_database.orders[name].id
         d1_name            = cloudflare_d1_database.orders[name].name
         r2_name            = cloudflare_r2_bucket.wallpapers[name].name

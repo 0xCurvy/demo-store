@@ -8,9 +8,10 @@ export interface Env {
   CURVY_PAYMENTS_PUBLIC_KEY?: string;
   MERCHANT_INTENT_SIGNING_KEY?: string;
   MERCHANT_SIGNER_NOT_AFTER?: string;
+  CURVY_ENVIRONMENT?: string;
   CHAIN_ID?: string;
-  TOKEN_ADDRESS?: string;
   AGGREGATOR_ADDRESS?: string;
+  TOKENS?: string;
   CHECKOUT_URL?: string;
   RPC_URL?: string;
   ADMIN_TOKEN?: string;

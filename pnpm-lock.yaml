@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@0xcurvy/payments-sdk@0.2.0-rc.1': 6af6f88e1e7b95feed2acbefd221a089b1a063ab9781cb262f9fe03180cc3db4
+  '@0xcurvy/payments-sdk@0.2.0-rc.2': 98e303a79fcbddddb8664481186718be47f32edb853cba390f9045b5c1df0641
 
 importers:
 
@@ -54,8 +54,8 @@ importers:
   server:
     dependencies:
       '@0xcurvy/payments-sdk':
-        specifier: 0.2.0-rc.1
-        version: 0.2.0-rc.1(patch_hash=6af6f88e1e7b95feed2acbefd221a089b1a063ab9781cb262f9fe03180cc3db4)(@0xcurvy/rs-core-wasm@0.1.0-rc.4)(typescript@5.9.3)(zod@4.6.5)
+        specifier: 0.2.0-rc.2
+        version: 0.2.0-rc.2(patch_hash=98e303a79fcbddddb8664481186718be47f32edb853cba390f9045b5c1df0641)(@0xcurvy/rs-core-wasm@0.1.0-rc.4)(typescript@5.9.3)(zod@4.6.5)
       '@0xcurvy/rs-core-wasm':
         specifier: 0.1.0-rc.4
         version: 0.1.0-rc.4
@@ -140,8 +140,8 @@ importers:
   worker:
     dependencies:
       '@0xcurvy/payments-sdk':
-        specifier: 0.2.0-rc.1
-        version: 0.2.0-rc.1(patch_hash=6af6f88e1e7b95feed2acbefd221a089b1a063ab9781cb262f9fe03180cc3db4)(@0xcurvy/rs-core-wasm@0.1.0-rc.4)(typescript@5.9.3)(zod@4.6.5)
+        specifier: 0.2.0-rc.2
+        version: 0.2.0-rc.2(patch_hash=98e303a79fcbddddb8664481186718be47f32edb853cba390f9045b5c1df0641)(@0xcurvy/rs-core-wasm@0.1.0-rc.4)(typescript@5.9.3)(zod@4.6.5)
       '@0xcurvy/rs-core-wasm':
         specifier: 0.1.0-rc.4
         version: 0.1.0-rc.4
@@ -176,8 +176,8 @@ importers:
 
 packages:
 
-  '@0xcurvy/payments-sdk@0.2.0-rc.1':
-    resolution: {integrity: sha512-EMv7cM/Kyiz4KJ74IqvdHe9edP+GuZESSe0ZWcrh4ojPp2Ul6wEIEwkgqNV8SrPTvyjR1oQwtkhRb0ZgkQrO/g==}
+  '@0xcurvy/payments-sdk@0.2.0-rc.2':
+    resolution: {integrity: sha512-n692O3e61fzUVV5eCOk4gJJ42GQgOe+Hag5GS6Qn9mi9rRhpAxdmSvxTGFMyceI/JQ4cu/0411S1nPt8ed13MA==}
     engines: {node: '>=22.16'}
     hasBin: true
     peerDependencies:
@@ -3168,7 +3168,7 @@ packages:
 
 snapshots:
 
-  '@0xcurvy/payments-sdk@0.2.0-rc.1(patch_hash=6af6f88e1e7b95feed2acbefd221a089b1a063ab9781cb262f9fe03180cc3db4)(@0xcurvy/rs-core-wasm@0.1.0-rc.4)(typescript@5.9.3)(zod@4.6.5)':
+  '@0xcurvy/payments-sdk@0.2.0-rc.2(patch_hash=98e303a79fcbddddb8664481186718be47f32edb853cba390f9045b5c1df0641)(@0xcurvy/rs-core-wasm@0.1.0-rc.4)(typescript@5.9.3)(zod@4.6.5)':
     dependencies:
       viem: 2.57.0(typescript@5.9.3)(zod@4.6.5)
     optionalDependencies:

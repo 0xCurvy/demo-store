@@ -51,14 +51,12 @@ jobs:
           workingDirectory: worker
           environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
           command: deploy
-          # The network values are public and live in wrangler.toml; only these four are secrets.
+          # The Curvy stack, receiving keys and network are public and live in wrangler.toml; only these are secrets.
           secrets: |
-            CURVY_PAYMENTS_PUBLIC_KEY
             MERCHANT_INTENT_SIGNING_KEY
             RPC_URL
             ADMIN_TOKEN
         env:
-          CURVY_PAYMENTS_PUBLIC_KEY: ${{ secrets.CURVY_PAYMENTS_PUBLIC_KEY }}
           MERCHANT_INTENT_SIGNING_KEY: ${{ secrets.MERCHANT_INTENT_SIGNING_KEY }}
           RPC_URL: ${{ secrets.RPC_URL }}
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}

@@ -3,7 +3,7 @@
  * ten, each keeping the number printed on it.
  * The shop page shows each one's thumbnail from `web/public/thumbs`; the full file sits in WALLPAPERS_DIR and is
  * only ever sent through a paid order's one-time download link. Prices are US dollar amounts as decimal strings
- * (so $1.337 is exact) and assume TOKEN_ADDRESS is a USD stablecoin such as USDC. Curvy checkout refuses payments
+ * (so $1.337 is exact) and assume the shop prices in a USD stablecoin such as USDC. Curvy checkout refuses payments
  * below $0.50, so every price stays above it.
  */
 export interface Product {
