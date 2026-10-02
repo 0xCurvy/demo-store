@@ -21,9 +21,15 @@ enabled = true
 workers_dev = true
 routes = [{ pattern = "dev.brutalism.store", custom_domain = true }]
 
+# Public settings. The secrets (receiving keys, signing key, RPC URL, admin token) are set on the Worker by the
+# deploy workflow from GitHub, never here.
 [env.development.vars]
 ENVIRONMENT = "development"
 MERCHANT_ORIGIN = "https://dev.brutalism.store"
+CHAIN_ID = "42161"
+TOKEN_ADDRESS = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+AGGREGATOR_ADDRESS = "0xe51924cef003a654ec9735c4d97f5d4862cbcbb1"
+CHECKOUT_URL = "https://app.curvy.box/checkout"
 
 [[env.development.d1_databases]]
 binding = "ORDERS"
@@ -42,9 +48,15 @@ crons = ["* * * * *"]
 workers_dev = false
 routes = [{ pattern = "brutalism.store", custom_domain = true }]
 
+# Public settings. The secrets (receiving keys, signing key, RPC URL, admin token) are set on the Worker by the
+# deploy workflow from GitHub, never here.
 [env.production.vars]
 ENVIRONMENT = "production"
 MERCHANT_ORIGIN = "https://brutalism.store"
+CHAIN_ID = "42161"
+TOKEN_ADDRESS = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+AGGREGATOR_ADDRESS = "0xe51924cef003a654ec9735c4d97f5d4862cbcbb1"
+CHECKOUT_URL = "https://app.curvy.box/checkout"
 
 [[env.production.d1_databases]]
 binding = "ORDERS"

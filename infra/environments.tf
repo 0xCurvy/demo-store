@@ -31,12 +31,16 @@ resource "local_file" "wrangler" {
     zone_name  = var.zone_name
     environments = {
       for name, env in var.environments : name => {
-        host        = env.host
-        cron        = env.cron
-        workers_dev = env.workers_dev
-        d1_id       = cloudflare_d1_database.orders[name].id
-        d1_name     = cloudflare_d1_database.orders[name].name
-        r2_name     = cloudflare_r2_bucket.wallpapers[name].name
+        host               = env.host
+        cron               = env.cron
+        workers_dev        = env.workers_dev
+        chain_id           = env.chain_id
+        token_address      = env.token_address
+        aggregator_address = env.aggregator_address
+        checkout_url       = env.checkout_url
+        d1_id              = cloudflare_d1_database.orders[name].id
+        d1_name            = cloudflare_d1_database.orders[name].name
+        r2_name            = cloudflare_r2_bucket.wallpapers[name].name
       }
     }
   })

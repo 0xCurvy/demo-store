@@ -22,9 +22,15 @@ enabled = true
 workers_dev = ${env.workers_dev}
 routes = [{ pattern = "${env.host}", custom_domain = true }]
 
+# Public settings. The secrets (receiving keys, signing key, RPC URL, admin token) are set on the Worker by the
+# deploy workflow from GitHub, never here.
 [env.${name}.vars]
 ENVIRONMENT = "${name}"
 MERCHANT_ORIGIN = "https://${env.host}"
+CHAIN_ID = "${env.chain_id}"
+TOKEN_ADDRESS = "${env.token_address}"
+AGGREGATOR_ADDRESS = "${env.aggregator_address}"
+CHECKOUT_URL = "${env.checkout_url}"
 
 [[env.${name}.d1_databases]]
 binding = "ORDERS"

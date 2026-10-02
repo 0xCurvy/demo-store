@@ -46,8 +46,9 @@ infra/upload-wallpapers.sh production
 
 The deploy workflow reads them from two GitHub environments, `production` and `development`, so each has its own
 keys. `infra/seed-secrets.sh` sets all of them from your local `.env` and the token in your environment, and never
-prints a value. Fill `.env` first (`CURVY_PAYMENTS_PUBLIC_KEY` and the network values come from the Curvy web app's
-Payments setup; `RPC_URL` is your own endpoint), then:
+prints a value. Fill `.env` first (`CURVY_PAYMENTS_PUBLIC_KEY` comes from the Curvy web app's Payments setup; `RPC_URL` is your
+own endpoint). The network values (chain, token, aggregator, checkout URL) are public and come from Terraform via
+`wrangler.toml`; change them in `variables.tf`. Then:
 
 ```sh
 infra/seed-secrets.sh                       # production and development from .env

@@ -4,9 +4,9 @@
 # never prints one:
 #   CLOUDFLARE_API_TOKEN            from the environment (direnv loads infra/.envrc)
 #   CLOUDFLARE_ACCOUNT_ID           from worker/wrangler.toml, as Terraform wrote it
-#   CURVY_PAYMENTS_PUBLIC_KEY, MERCHANT_INTENT_SIGNING_KEY, RPC_URL, ADMIN_TOKEN,
-#   CHAIN_ID, TOKEN_ADDRESS, AGGREGATOR_ADDRESS, CHECKOUT_URL
+#   CURVY_PAYMENTS_PUBLIC_KEY, MERCHANT_INTENT_SIGNING_KEY, RPC_URL, ADMIN_TOKEN
 #                                   from .env (the same values the Node server uses)
+# The network values (chain, token, aggregator, checkout URL) are public and come from Terraform via wrangler.toml.
 # Production gets the .env values. Development gets the same, except its own freshly generated signing key, so a
 # leak of one environment's key never touches the other. Pass --dev-env-file <file> to give development its own
 # values instead (for example Sepolia test money).
@@ -44,19 +44,14 @@ gh secret set CLOUDFLARE_ACCOUNT_ID --repo "$repo" --body "$account_id"
 
 seed_environment() { # seed_environment <environment> <env file> <signing key>
   local environment="$1" file="$2" signing_key="$3"
-  local public_key rpc_url admin_token chain_id token_address aggregator checkout_url
+  local public_key rpc_url admin_token
 
   public_key="$(value "$file" CURVY_PAYMENTS_PUBLIC_KEY)"
   rpc_url="$(value "$file" RPC_URL)"
   admin_token="$(value "$file" ADMIN_TOKEN)"
-  chain_id="$(value "$file" CHAIN_ID)"
-  token_address="$(value "$file" TOKEN_ADDRESS)"
-  aggregator="$(value "$file" AGGREGATOR_ADDRESS)"
-  checkout_url="$(value "$file" CHECKOUT_URL)"
 
   for pair in "CURVY_PAYMENTS_PUBLIC_KEY=$public_key" "RPC_URL=$rpc_url" "ADMIN_TOKEN=$admin_token" \
-    "CHAIN_ID=$chain_id" "TOKEN_ADDRESS=$token_address" "AGGREGATOR_ADDRESS=$aggregator" \
-    "CHECKOUT_URL=$checkout_url" "MERCHANT_INTENT_SIGNING_KEY=$signing_key"; do
+    "MERCHANT_INTENT_SIGNING_KEY=$signing_key"; do
     require "${pair%%=*}" "${pair#*=}"
   done
 
@@ -67,10 +62,6 @@ seed_environment() { # seed_environment <environment> <env file> <signing key>
   gh secret set MERCHANT_INTENT_SIGNING_KEY --repo "$repo" --env "$environment" --body "$signing_key"
   gh secret set RPC_URL --repo "$repo" --env "$environment" --body "$rpc_url"
   gh secret set ADMIN_TOKEN --repo "$repo" --env "$environment" --body "$admin_token"
-  gh variable set CHAIN_ID --repo "$repo" --env "$environment" --body "$chain_id"
-  gh variable set TOKEN_ADDRESS --repo "$repo" --env "$environment" --body "$token_address"
-  gh variable set AGGREGATOR_ADDRESS --repo "$repo" --env "$environment" --body "$aggregator"
-  gh variable set CHECKOUT_URL --repo "$repo" --env "$environment" --body "$checkout_url"
 }
 
 production_key="$(value "$root/.env" MERCHANT_INTENT_SIGNING_KEY)"

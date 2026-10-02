@@ -22,19 +22,32 @@ variable "environments" {
     git_branch  = string
     cron        = string
     workers_dev = bool
+    # The network the environment takes payments on, from the Curvy web app's Payments setup. Public values.
+    chain_id           = number
+    token_address      = string
+    aggregator_address = string
+    checkout_url       = string
   }))
   default = {
     production = {
-      host        = "brutalism.store"
-      git_branch  = "main"
-      cron        = "* * * * *"
-      workers_dev = false
+      host               = "brutalism.store"
+      git_branch         = "main"
+      cron               = "* * * * *"
+      workers_dev        = false
+      chain_id           = 42161
+      token_address      = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+      aggregator_address = "0xe51924cef003a654ec9735c4d97f5d4862cbcbb1"
+      checkout_url       = "https://app.curvy.box/checkout"
     }
     development = {
-      host        = "dev.brutalism.store"
-      git_branch  = "develop"
-      cron        = "* * * * *"
-      workers_dev = true
+      host               = "dev.brutalism.store"
+      git_branch         = "develop"
+      cron               = "* * * * *"
+      workers_dev        = true
+      chain_id           = 42161
+      token_address      = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+      aggregator_address = "0xe51924cef003a654ec9735c4d97f5d4862cbcbb1"
+      checkout_url       = "https://app.curvy.box/checkout"
     }
   }
 }
