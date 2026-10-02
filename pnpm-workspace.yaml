@@ -1,0 +1,15 @@
+packages:
+  - server
+  - web
+
+# Install only versions that have been public for at least a day, so a hijacked release has time to
+# be caught before it lands here. Curvy's payments SDK is exempt: this shop tracks its releases.
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  - "@0xcurvy/payments-sdk"
+
+# Install scripts pnpm may run. Neither of these needs its own: both ship prebuilt binaries.
+allowBuilds:
+  "@swc/core": false
+  esbuild: false
