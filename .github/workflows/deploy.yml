@@ -1,0 +1,59 @@
+name: Deploy
+
+# main → brutalism.store (production), develop → dev.brutalism.store (development).
+# Infrastructure (zone, D1, R2) comes from infra/ via Terraform; this deploys the Worker and the pages.
+on:
+  push:
+    branches: [main, develop]
+    # Add web/** and server/src/catalog/** once the Worker in worker/ exists; until then only its own changes deploy.
+    paths:
+      - worker/**
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+    runs-on: ubuntu-latest
+    # GitHub environments hold the per-deployment secrets (see infra/README.md).
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @curvy-checkout-demo/web build
+      - name: Deploy the Worker and sync its secrets
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          workingDirectory: worker
+          environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+          command: deploy
+          secrets: |
+            CURVY_PAYMENTS_PUBLIC_KEY
+            MERCHANT_INTENT_SIGNING_KEY
+            CHAIN_ID
+            TOKEN_ADDRESS
+            AGGREGATOR_ADDRESS
+            CHECKOUT_URL
+            RPC_URL
+            ADMIN_TOKEN
+        env:
+          CURVY_PAYMENTS_PUBLIC_KEY: ${{ secrets.CURVY_PAYMENTS_PUBLIC_KEY }}
+          MERCHANT_INTENT_SIGNING_KEY: ${{ secrets.MERCHANT_INTENT_SIGNING_KEY }}
+          CHAIN_ID: ${{ vars.CHAIN_ID }}
+          TOKEN_ADDRESS: ${{ vars.TOKEN_ADDRESS }}
+          AGGREGATOR_ADDRESS: ${{ vars.AGGREGATOR_ADDRESS }}
+          CHECKOUT_URL: ${{ vars.CHECKOUT_URL }}
+          RPC_URL: ${{ secrets.RPC_URL }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}

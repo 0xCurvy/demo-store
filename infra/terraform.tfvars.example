@@ -1,0 +1,2 @@
+# Copy to terraform.tfvars. The account id is on the Cloudflare dashboard's overview page; it is not a secret.
+cloudflare_account_id = "023e105f4ecef8ad9ca31a8372d0c353"
