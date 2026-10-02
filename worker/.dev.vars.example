@@ -1,0 +1,9 @@
+# Copy to .dev.vars for `pnpm --filter @curvy-checkout-demo/worker dev`. Same names as the server's .env.
+CURVY_PAYMENTS_PUBLIC_KEY=
+MERCHANT_INTENT_SIGNING_KEY=
+CHAIN_ID=
+TOKEN_ADDRESS=
+AGGREGATOR_ADDRESS=
+CHECKOUT_URL=https://app.curvy.box/checkout
+RPC_URL=
+ADMIN_TOKEN=

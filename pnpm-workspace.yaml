@@ -1,6 +1,7 @@
 packages:
   - server
   - web
+  - worker
 
 # Install only versions that have been public for at least a day, so a hijacked release has time to
 # be caught before it lands here. Curvy's payments SDK is exempt: this shop tracks its releases.
@@ -13,3 +14,8 @@ minimumReleaseAgeExclude:
 allowBuilds:
   "@swc/core": false
   esbuild: false
+  # The Workers runtime for local development and tests: its install script fetches the workerd binary.
+  workerd: true
+
+patchedDependencies:
+  "@0xcurvy/payments-sdk@0.2.0-rc.1": patches/@0xcurvy__payments-sdk@0.2.0-rc.1.patch

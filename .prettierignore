@@ -3,3 +3,6 @@ dist
 .data
 vendor
 pnpm-lock.yaml
+.wrangler
+.terraform
+wallpapers

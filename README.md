@@ -69,6 +69,13 @@ server/src/
     rate-limits.ts         per-visitor limits on orders, payment checks and the API
     contract.ts            the API's response types, shared with the web app
 
+worker/src/
+  index.ts                 the Worker: the API on fetch, the payment check on the cron trigger
+  app.ts                   the routes, on Hono
+  d1-repository.ts         orders in D1, with optimistic writes
+  download.ts              the one-time download, streamed from R2
+  shop.ts                  the shop assembled from the Worker's vars and secrets
+
 web/src/
   pages/                   one component per page: shop, completion, admin
   features/
@@ -95,7 +102,25 @@ web/src/
 | `WALLPAPERS_DIR`                                  | The folder with the 4K files (default `wallpapers`). They are not in the repository.                   |
 | `CLIENT_IP_HEADER`                                | Behind a proxy, the header it puts the visitor's address in (`X-Real-IP` on Railway).                  |
 
-## Going to production
+## On Cloudflare
+
+`worker/` is the same shop as a Cloudflare Worker: Hono instead of Express, D1 instead of the JSON file, R2 instead
+of the `wallpapers/` folder, and a cron trigger instead of the background timer. It imports the order flow, the
+catalogue and the settings straight from `server/src`, so there is one implementation of how an order is paid. The
+built pages are served as static assets beside it. `infra/` creates everything it needs (see `infra/README.md`),
+and `.github/workflows/deploy.yml` deploys `develop` to `dev.brutalism.store` and `main` to `brutalism.store`.
+
+```sh
+cp worker/.dev.vars.example worker/.dev.vars     # the same values as .env
+pnpm --filter @curvy-checkout-demo/web build
+pnpm --filter @curvy-checkout-demo/worker dev      # http://localhost:8787, local D1 and R2
+pnpm --filter @curvy-checkout-demo/worker test     # runs inside workerd
+```
+
+The Payments SDK reads its Rust core from disk in Node; `patches/` carries the one-line change that lets the Worker
+hand it the compiled module instead.
+
+## Going to production on your own server
 
 ```sh
 pnpm run build

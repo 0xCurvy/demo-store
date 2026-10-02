@@ -18,7 +18,7 @@ const multilineStatements = [
 ];
 
 export default tseslint.config(
-  { ignores: ["**/node_modules", "**/dist", ".data", "vendor"] },
+  { ignores: ["**/node_modules", "**/dist", "**/.wrangler", ".data", "vendor", "wallpapers"] },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   prettier,
@@ -44,6 +44,10 @@ export default tseslint.config(
   {
     files: ["server/**/*.ts"],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ["worker/**/*.ts"],
+    languageOptions: { globals: { ...globals.serviceworker, ...globals.node } },
   },
   {
     files: ["web/**/*.{ts,tsx}"],

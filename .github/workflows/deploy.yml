@@ -5,9 +5,12 @@ name: Deploy
 on:
   push:
     branches: [main, develop]
-    # Add web/** and server/src/catalog/** once the Worker in worker/ exists; until then only its own changes deploy.
     paths:
       - worker/**
+      - web/**
+      - server/src/**
+      - patches/**
+      - pnpm-lock.yaml
       - .github/workflows/deploy.yml
   workflow_dispatch:
 
@@ -30,6 +33,15 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @curvy-checkout-demo/web build
+      - name: Apply D1 migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          workingDirectory: worker
+          environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+          command: d1 migrations apply ORDERS --remote
       - name: Deploy the Worker and sync its secrets
         uses: cloudflare/wrangler-action@v3
         with:

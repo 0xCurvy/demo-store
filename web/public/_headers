@@ -1,0 +1,7 @@
+# Headers for the pages when they are served as static assets beside the Worker (Cloudflare), the same ones the
+# Node server sets for its built pages. The API's responses set their own.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
