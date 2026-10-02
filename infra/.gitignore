@@ -3,3 +3,5 @@
 *.tfstate.*
 terraform.tfvars
 crash.log
+# direnv files may hold the API token
+.envrc

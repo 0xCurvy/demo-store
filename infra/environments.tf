@@ -7,6 +7,8 @@ resource "cloudflare_d1_database" "orders" {
   account_id            = var.cloudflare_account_id
   name                  = "brutalism-store-${each.key}-orders"
   primary_location_hint = var.region_hint
+  # The API rejects an update without this field, so it is always set.
+  read_replication = { mode = "disabled" }
 }
 
 resource "cloudflare_r2_bucket" "wallpapers" {

@@ -2,20 +2,22 @@
 
 Everything the shop needs on Cloudflare, as Terraform, for two environments:
 
-| Environment | Branch    | Host                   | Orders database (D1)                 | Wallpapers (R2)                          |
-| ----------- | --------- | ---------------------- | ------------------------------------ | ---------------------------------------- |
-| production  | `main`    | `brutalism.store`      | `brutalism-store-production-orders`  | `brutalism-store-production-wallpapers`  |
-| development | `develop` | `dev.brutalism.store`  | `brutalism-store-development-orders` | `brutalism-store-development-wallpapers` |
+| Environment | Branch    | Host                  | Orders database (D1)                 | Wallpapers (R2)                          |
+| ----------- | --------- | --------------------- | ------------------------------------ | ---------------------------------------- |
+| production  | `main`    | `brutalism.store`     | `brutalism-store-production-orders`  | `brutalism-store-production-wallpapers`  |
+| development | `develop` | `dev.brutalism.store` | `brutalism-store-development-orders` | `brutalism-store-development-wallpapers` |
 
-Terraform owns the zone, its TLS settings, and each environment's D1 database and R2 bucket. It also writes
+Terraform owns the zone's TLS settings and each environment's D1 database and R2 bucket. The zone itself must
+already be on the account: Cloudflare Registrar adds it when the domain is registered there, otherwise add the
+site in the dashboard first (creating zones needs an account permission most API tokens do not carry). It also writes
 `worker/wrangler.toml` from those resources, so the Worker's bindings can never drift from what exists. The Worker
 itself, its custom domain and its cron trigger are deployed by `wrangler` from that file, from the GitHub Actions
 workflow in `.github/workflows/deploy.yml`, so code and bindings ship together.
 
 ## First time
 
-You need Terraform 1.9 or newer, and a Cloudflare API token with these permissions on the account: Zone (Edit),
-Zone Settings (Edit), DNS (Edit), Workers Scripts (Edit), D1 (Edit), Workers R2 Storage (Edit).
+You need Terraform 1.9 or newer, and a Cloudflare API token with these permissions: on the zone, Zone (Read),
+Zone Settings (Edit) and DNS (Edit); on the account, Workers Scripts (Edit), D1 (Edit) and Workers R2 Storage (Edit).
 
 ```sh
 cd infra
@@ -25,14 +27,7 @@ terraform init
 terraform apply
 ```
 
-If `brutalism.store` was registered through Cloudflare Registrar, the zone already exists. Import it before the
-first apply, then apply as usual:
-
-```sh
-terraform import cloudflare_zone.shop <zone id from the dashboard>
-```
-
-Otherwise point the registrar's name servers at the `name_servers` output.
+If the domain was registered elsewhere, point its registrar at the `name_servers` output.
 
 `terraform apply` writes `worker/wrangler.toml`. Commit it.
 

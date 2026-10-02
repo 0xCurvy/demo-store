@@ -4,7 +4,7 @@ variable "cloudflare_account_id" {
 }
 
 variable "zone_name" {
-  description = "The shop's domain. The zone is created here; the registrar's name servers must then point at it."
+  description = "The shop's domain. Its zone must already be on the account (Cloudflare Registrar adds it; otherwise add the site in the dashboard)."
   type        = string
   default     = "brutalism.store"
 }

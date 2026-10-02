@@ -1,10 +1,10 @@
 output "zone_id" {
-  value = cloudflare_zone.shop.id
+  value = data.cloudflare_zone.shop.id
 }
 
 output "name_servers" {
   description = "Point the registrar at these. Not needed when the domain is registered with Cloudflare."
-  value       = cloudflare_zone.shop.name_servers
+  value       = data.cloudflare_zone.shop.name_servers
 }
 
 output "d1_databases" {
