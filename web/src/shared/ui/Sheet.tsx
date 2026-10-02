@@ -6,11 +6,12 @@ type SheetProps = ComponentProps<"section"> & {
   offset?: "sky" | "red" | "ochre" | "ink" | "none";
 };
 
+/** The offset shadow, and the same colour as `--offset-color` for anything inside that wants to match it. */
 const OFFSETS = {
-  sky: "shadow-print-sky",
-  red: "shadow-print-red",
-  ochre: "shadow-print-ochre",
-  ink: "shadow-print-ink",
+  sky: "shadow-print-sky [--offset-color:var(--color-sky)]",
+  red: "shadow-print-red [--offset-color:var(--color-red)]",
+  ochre: "shadow-print-ochre [--offset-color:var(--color-ochre)]",
+  ink: "shadow-print-ink [--offset-color:var(--color-ink)]",
   none: "",
 };
 
