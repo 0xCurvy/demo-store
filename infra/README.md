@@ -44,30 +44,26 @@ infra/upload-wallpapers.sh production
 
 ## Deploy secrets
 
-The deploy workflow reads them from two GitHub environments, `production` and `development`, so each environment has
-its own keys. Seed them once per environment (each command prompts for the value):
+The deploy workflow reads them from two GitHub environments, `production` and `development`, so each has its own
+keys. `infra/seed-secrets.sh` sets all of them from your local `.env` and the token in your environment, and never
+prints a value. Fill `.env` first (`CURVY_PAYMENTS_PUBLIC_KEY` and the network values come from the Curvy web app's
+Payments setup; `RPC_URL` is your own endpoint), then:
 
 ```sh
-# Shared by both environments (repository secrets)
-gh secret set CLOUDFLARE_API_TOKEN --repo 0xCurvy/demo-store
-gh secret set CLOUDFLARE_ACCOUNT_ID --repo 0xCurvy/demo-store
-
-# Per environment (repeat with --env development)
-gh secret set CURVY_PAYMENTS_PUBLIC_KEY   --repo 0xCurvy/demo-store --env production
-gh secret set MERCHANT_INTENT_SIGNING_KEY --repo 0xCurvy/demo-store --env production
-gh secret set RPC_URL                     --repo 0xCurvy/demo-store --env production
-gh secret set ADMIN_TOKEN                 --repo 0xCurvy/demo-store --env production
-
-# Public values, as environment variables (repeat with --env development)
-gh variable set CHAIN_ID           --repo 0xCurvy/demo-store --env production --body 42161
-gh variable set TOKEN_ADDRESS      --repo 0xCurvy/demo-store --env production --body 0xaf88d065e77c8cC2239327C5EDb3A432268e5831
-gh variable set AGGREGATOR_ADDRESS --repo 0xCurvy/demo-store --env production --body 0xe51924cef003a654ec9735c4d97f5d4862cbcbb1
-gh variable set CHECKOUT_URL       --repo 0xCurvy/demo-store --env production --body https://app.curvy.box/checkout
+infra/seed-secrets.sh                       # production and development from .env
+infra/seed-secrets.sh --dev-env-file .env.development   # development from its own file, e.g. Sepolia
 ```
 
-The workflow passes them to the Worker as secrets on every deploy, so rotating one is a matter of setting it again
-and re-running the workflow. The development environment can point at Ethereum Sepolia instead (chain id 11155111
-and the test USDC from `.env.example`).
+Development always gets a freshly generated signing key of its own. Re-run the script whenever a value changes,
+then re-run the Deploy workflow:
+
+```sh
+gh workflow run deploy.yml --repo 0xCurvy/demo-store --ref main
+gh workflow run deploy.yml --repo 0xCurvy/demo-store --ref develop
+```
+
+The workflow passes the values to the Worker as secrets on every deploy, so rotating one is a matter of setting
+it again and deploying.
 
 ## Day to day
 
