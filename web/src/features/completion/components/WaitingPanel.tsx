@@ -1,7 +1,7 @@
 import type { OrderView } from "@api";
 import { formatPrice } from "@/shared/lib/money";
 import { Button } from "@/shared/ui/Button";
-import { OverprintLoader } from "@/shared/ui/OverprintLoader";
+import { ShopLoader } from "@/shared/ui/ShopLoader";
 import { Sheet } from "@/shared/ui/Sheet";
 
 type WaitingPanelProps = {
@@ -30,13 +30,13 @@ export function WaitingPanel({ order, stage, startingAgain, onPayAgain }: Waitin
   const { title, text } = COPY[stage];
 
   return (
-    <Sheet offset="pink" aria-live="polite" className="p-6 md:p-8">
-      <OverprintLoader label={title} />
+    <Sheet offset="red" aria-live="polite" className="p-6 md:p-8">
+      <ShopLoader label={title} />
       <h1 className="mt-6 text-3xl font-extrabold font-stretch-expanded">{title}</h1>
       <p className="mt-2 leading-relaxed text-ink-muted">{text}</p>
 
       <p className="mt-6 border-t-2 border-dashed border-ink pt-4 font-semibold">
-        {order.productName}, {formatPrice(order.priceCents)}
+        {order.productName}, {formatPrice(order.price)}
       </p>
 
       {stage === "link-closed" && (

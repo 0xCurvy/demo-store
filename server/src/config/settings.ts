@@ -48,6 +48,8 @@ export interface ServerSettings {
   checkPaymentsEverySeconds: number;
   /** The header a proxy in front of the shop puts the visitor's address in; null reads the connection. */
   clientIpHeader: string | null;
+  /** The folder with the 4K files, relative to the project root unless absolute. */
+  wallpapersDir: string;
 }
 
 const SIGNER_VALIDITY_DAYS = 90;
@@ -84,6 +86,7 @@ const serverSchema = z.object({
   ADMIN_TOKEN: field.secret.optional(),
   CHECK_PAYMENTS_EVERY_SECONDS: field.positiveInteger.default(30),
   CLIENT_IP_HEADER: field.headerName.optional(),
+  WALLPAPERS_DIR: z.string().default("wallpapers"),
 });
 
 /** Blank values count as unset, so `NAME=` in `.env` means "use the default". */
@@ -145,5 +148,6 @@ export function readServerSettings(env: Env): Settings<ServerSettings> {
     adminToken: values.ADMIN_TOKEN ?? null,
     checkPaymentsEverySeconds: values.CHECK_PAYMENTS_EVERY_SECONDS,
     clientIpHeader: values.CLIENT_IP_HEADER ?? null,
+    wallpapersDir: values.WALLPAPERS_DIR,
   }));
 }

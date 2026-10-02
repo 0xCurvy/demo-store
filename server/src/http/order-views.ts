@@ -23,7 +23,7 @@ export function orderView(order: Order, chainId: number): OrderView {
   return {
     id: order.id,
     productName: order.productName,
-    priceCents: order.priceCents,
+    price: order.price,
     chainId,
     token: order.token,
     amount: order.amount,
@@ -31,6 +31,13 @@ export function orderView(order: Order, chainId: number): OrderView {
     attempts: order.attempts.map(attemptView),
     createdAt: order.createdAt,
     paidAt: order.paidAt,
+    download: order.download
+      ? {
+          url: `/download/${order.download.token}`,
+          expiresAt: order.download.expiresAt,
+          downloadedAt: order.download.downloadedAt,
+        }
+      : null,
   };
 }
 
@@ -57,9 +64,12 @@ export function adminOrderView(
     };
   });
 
+  const { download, ...view } = orderView(order, chainId);
+
   return {
-    ...orderView(order, chainId),
+    ...view,
     fulfilledAt: order.fulfilledAt,
+    downloadedAt: download?.downloadedAt ?? null,
     netReceived: netReceived(order).toString(),
     attempts,
   };

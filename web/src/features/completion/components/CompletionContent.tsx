@@ -1,7 +1,7 @@
 import type { OrderView } from "@api";
 import { errorMessage } from "@/shared/api/client";
 import { Notice } from "@/shared/ui/Notice";
-import { OverprintLoader } from "@/shared/ui/OverprintLoader";
+import { ShopLoader } from "@/shared/ui/ShopLoader";
 import { isNoOrder } from "../hooks/useCheckoutReturn";
 import { completionScreen } from "../utils/completion-screen";
 import { NoOrder } from "./NoOrder";
@@ -23,7 +23,7 @@ type CompletionContentProps = {
 export function CompletionContent(props: CompletionContentProps) {
   const { order, checkedAt, error, retrying, startingAgain, onPayAgain } = props;
 
-  if (retrying) return <OverprintLoader label="Starting a new payment" />;
+  if (retrying) return <ShopLoader label="Starting a new payment" />;
 
   if (isNoOrder(error)) return <NoOrder />;
 
@@ -35,7 +35,7 @@ export function CompletionContent(props: CompletionContentProps) {
     );
   }
 
-  if (!order) return <OverprintLoader label="Loading your order" />;
+  if (!order) return <ShopLoader label="Loading your order" />;
 
   const screen = completionScreen(order, Math.floor(checkedAt / 1_000));
   const payAgain = () => onPayAgain(order.attempts.at(-1)?.ephemeralKeyX ?? "");

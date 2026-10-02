@@ -14,20 +14,21 @@ describe("creating an order", () => {
 
     payments.head = 5_000n;
 
-    const { order, checkoutUrl } = await shop.orders.createOrder("blue-hour-print");
+    const { order, checkoutUrl } = await shop.orders.createOrder("01-beograd-genex");
     const record = readRecord(order.attempts[0]!);
 
-    expect(order.amount).toBe("4000000");
+    expect(order.amount).toBe("1337000");
     expect(order.status).toBe("processing");
     expect(record.fromBlock).toBe(5_000n);
     expect(checkoutUrl.startsWith("https://checkout.example/checkout#")).toBe(true);
 
     const signed = decodePaymentIntentFragment(new URL(checkoutUrl).hash);
 
-    expect(signed.intent.amount).toBe("4000000");
+    expect(signed.intent.amount).toBe("1337000");
     expect(signed.intent.merchantOrigin).toBe("https://shop.example");
+
     // Signed, so checkout can show what is being bought.
-    expect(signed.intent.description).toBe("Blue hour · An A5 art print in blue and pink");
+    expect(signed.intent.description).toBe("Beograd · Genex kula · 4K wallpaper 01/10");
   });
 
   it("refuses an unknown product", async () => {
@@ -39,10 +40,10 @@ describe("creating an order", () => {
   it("waits while the shop already has as many unpaid orders as it keeps open", async () => {
     const { shop } = await testShop({ MAX_OPEN_ORDERS: "2" });
 
-    await shop.orders.createOrder("sticker-sheet");
-    await shop.orders.createOrder("sticker-sheet");
+    await shop.orders.createOrder("01-beograd-genex");
+    await shop.orders.createOrder("01-beograd-genex");
 
-    await expect(shop.orders.createOrder("sticker-sheet")).rejects.toThrow(
+    await expect(shop.orders.createOrder("01-beograd-genex")).rejects.toThrow(
       "too many unpaid orders",
     );
   });
@@ -52,7 +53,7 @@ describe("creating an order", () => {
 
     payments.chainId = async () => 1;
 
-    await expect(shop.orders.createOrder("sticker-sheet")).rejects.toThrow(
+    await expect(shop.orders.createOrder("01-beograd-genex")).rejects.toThrow(
       "RPC_URL serves chain 1, but CHAIN_ID is 42161",
     );
   });
@@ -61,7 +62,7 @@ describe("creating an order", () => {
 describe("the transaction hash from the return URL", () => {
   it("pays the order when verifyPayment agrees, and fulfils it exactly once", async () => {
     const { shop, payments, log } = await testShop();
-    const { order } = await shop.orders.createOrder("blue-hour-print");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     payments.script = () => ({ status: "paid", payment: verifiedPayment() });
 
@@ -72,13 +73,15 @@ describe("the transaction hash from the return URL", () => {
 
     expect(paid.status).toBe("paid");
     expect(paid.fulfilledAt).not.toBeNull();
+    expect(paid.download?.token).toMatch(/^[0-9a-f]{64}$/);
+    expect(paid.download?.downloadedAt).toBeNull();
     expect(payments.verifyCalls[0]?.lookup).toEqual({ txHash: TX });
-    expect(log.count("is paid. Ship it.")).toBe(1);
+    expect(log.count("is paid. Download link issued.")).toBe(1);
   });
 
   it("is rejected when the transaction pays something else", async () => {
     const { shop, payments } = await testShop();
-    const { order } = await shop.orders.createOrder("sticker-sheet");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     payments.script = () => {
       throw new PaymentVerificationError("UNRELATED", "does not pay this request");
@@ -93,7 +96,7 @@ describe("the transaction hash from the return URL", () => {
 
   it("must look like a transaction hash", async () => {
     const { shop } = await testShop();
-    const { order } = await shop.orders.createOrder("sticker-sheet");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     await expect(shop.orders.acceptTxHash(order.id, "0x1234")).rejects.toThrow("32-byte hex hash");
   });
@@ -102,7 +105,7 @@ describe("the transaction hash from the return URL", () => {
 describe("the background check", () => {
   it("finds a payment without the buyer returning, then waits for confirmations", async () => {
     const { shop, payments } = await testShop();
-    const { order } = await shop.orders.createOrder("postcard-set");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     payments.script = () => ({
       status: "confirming",
@@ -124,7 +127,7 @@ describe("the background check", () => {
 
   it("goes back to scanning when a found transaction is reorged out", async () => {
     const { shop, payments } = await testShop();
-    const { order } = await shop.orders.createOrder("postcard-set");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     payments.script = () => ({
       status: "confirming",
@@ -144,7 +147,7 @@ describe("the background check", () => {
 
   it("starts later scans near the chain head, keeping a margin for reorgs", async () => {
     const { shop, payments } = await testShop();
-    const { order } = await shop.orders.createOrder("postcard-set");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     payments.head = 10_000n;
     await shop.reconciler.checkOpenOrders();
@@ -156,7 +159,7 @@ describe("the background check", () => {
 
   it("expires an attempt nobody paid, after the link closed and the grace period passed", async () => {
     const { shop, advance } = await testShop();
-    const { order } = await shop.orders.createOrder("postcard-set");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     await shop.reconciler.checkOpenOrders();
     // The link's hour, then the grace period.
@@ -172,7 +175,7 @@ describe("the background check", () => {
 describe("a fresh payment attempt", () => {
   it("is allowed for the latest attempt of an unpaid order", async () => {
     const { shop } = await testShop();
-    const { order } = await shop.orders.createOrder("sticker-sheet");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
     const latest = readRecord(order.attempts[0]!).payment.intent.ephemeralKeyX;
 
     const checkoutUrl = await shop.orders.startAttempt(order.id, latest);
@@ -182,13 +185,13 @@ describe("a fresh payment attempt", () => {
     expect(updated.attempts.map((attempt) => attempt.number)).toEqual([1, 2]);
 
     expect(decodePaymentIntentFragment(new URL(checkoutUrl).hash).intent.description).toBe(
-      "Sticker sheet · Six stickers on one sheet",
+      "Beograd · Genex kula · 4K wallpaper 01/10",
     );
   });
 
   it("is refused for a stale attempt, so a double click cannot pile them up", async () => {
     const { shop } = await testShop();
-    const { order } = await shop.orders.createOrder("sticker-sheet");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
     const first = readRecord(order.attempts[0]!).payment.intent.ephemeralKeyX;
 
     await shop.orders.startAttempt(order.id, first);
@@ -200,7 +203,7 @@ describe("a fresh payment attempt", () => {
 
   it("stops at ten attempts, so a script cannot pile them onto one order", async () => {
     const { shop } = await testShop();
-    const { order } = await shop.orders.createOrder("sticker-sheet");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
 
     const latest = async () => {
       const current = await shop.orders.getOrder(order.id);
@@ -221,7 +224,7 @@ describe("a fresh payment attempt", () => {
 
   it("is refused once a payment was found", async () => {
     const { shop, payments } = await testShop();
-    const { order } = await shop.orders.createOrder("sticker-sheet");
+    const { order } = await shop.orders.createOrder("01-beograd-genex");
     const latest = readRecord(order.attempts[0]!).payment.intent.ephemeralKeyX;
 
     payments.script = () => ({ status: "underpaid", payment: verifiedPayment({ netAmount: 1n }) });

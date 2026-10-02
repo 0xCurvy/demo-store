@@ -36,7 +36,7 @@ export function PaymentProblem({ order, problem, startingAgain, onPayAgain }: Pa
   const { title, text } = describe(order, problem);
 
   return (
-    <Sheet offset="pink" className="p-6 md:p-8">
+    <Sheet offset="red" className="p-6 md:p-8">
       <h1 className="text-3xl font-extrabold font-stretch-expanded">{title}</h1>
       <p className="mt-2 leading-relaxed text-ink-muted">{text}</p>
 

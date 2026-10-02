@@ -56,6 +56,14 @@ export class JsonFileRepository implements OrderRepository {
     return [...this.orders.values()].filter(isOrderOpen).map((order) => structuredClone(order));
   }
 
+  async byDownloadToken(token: string): Promise<Order | null> {
+    for (const order of this.orders.values()) {
+      if (order.download?.token === token) return structuredClone(order);
+    }
+
+    return null;
+  }
+
   private load(file: string): void {
     try {
       const saved = JSON.parse(readFileSync(file, "utf8")) as { orders: Order[] };

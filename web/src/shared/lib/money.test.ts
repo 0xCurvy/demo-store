@@ -17,6 +17,7 @@ describe("money", () => {
   });
 
   it("formats prices in dollars", () => {
-    expect(formatPrice(150)).toBe("$1.50");
+    expect(formatPrice("1.5")).toBe("$1.50");
+    expect(formatPrice("1.337")).toBe("$1.337");
   });
 });

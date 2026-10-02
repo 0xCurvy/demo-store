@@ -2,7 +2,7 @@ import { cn } from "@/shared/lib/cn";
 
 const STEPS = [
   {
-    title: "Choose Pay with Curvy",
+    title: "Choose Buy 4K wallpaper",
     text: "The shop creates your order and signs a one-time payment request for it.",
   },
   {
@@ -10,19 +10,20 @@ const STEPS = [
     text: "Send the amount from your own wallet. Curvy checks where it came from and delivers it to the shop privately.",
   },
   {
-    title: "Come back to the shop",
-    text: "The shop confirms the payment on chain before it counts the order as paid.",
+    title: "Come back and download",
+    text: "The shop confirms the payment on chain, then hands you a link to the 4K file that works once.",
   },
 ];
 
 /** Each step in one of the shop's inks; text stays readable on each. */
-const MARKS = ["bg-blue text-sheet", "bg-pink text-ink", "bg-yellow text-ink"];
+const MARKS = ["bg-sky text-sheet", "bg-red text-ink", "bg-ochre text-ink"];
 
 /** The three steps of a purchase, in order. */
 export function HowItWorks() {
   return (
     <section aria-labelledby="how-it-works">
-      <h2 id="how-it-works" className="text-2xl font-bold font-stretch-expanded">
+      <p className="border-b-2 border-ink pb-3 poster-label text-ink-muted">Kako se plaća</p>
+      <h2 id="how-it-works" className="mt-6 text-4xl poster-title">
         How paying works
       </h2>
 

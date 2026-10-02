@@ -59,6 +59,7 @@ const app = createApp({
   signerList,
   adminToken: server.value.adminToken,
   clientIpHeader: server.value.clientIpHeader,
+  wallpapersDir: resolve(PROJECT_ROOT, server.value.wallpapersDir),
   log,
   pages: dev ? await devPages(httpServer) : builtPages(),
 });

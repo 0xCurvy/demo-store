@@ -4,8 +4,8 @@ import { STATUS_LABELS, STATUS_TONES } from "@/shared/lib/status";
 
 const TONES = {
   done: "border-green-ink text-green-ink",
-  waiting: "border-blue-ink text-blue-ink",
-  problem: "border-pink-ink text-pink-ink",
+  waiting: "border-sky-ink text-sky-ink",
+  problem: "border-red-ink text-red-ink",
 };
 
 export function StatusLabel({ status }: { status: OrderStatus }) {

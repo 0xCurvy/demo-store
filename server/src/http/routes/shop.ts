@@ -3,7 +3,7 @@
  * POST /api/orders   { productId } → a new order and the Curvy checkout URL to send the buyer to
  */
 import { Router } from "express";
-import { PRODUCTS } from "../../catalog/products.js";
+import { PRODUCTS, SERIES_SIZE } from "../../catalog/products.js";
 import type { CreatedOrder, ShopView } from "../contract.js";
 import { setOrderCookie } from "../order-cookie.js";
 import { body, requireJson } from "../require-json.js";
@@ -24,7 +24,8 @@ export function shopRoutes(state: ShopState): Router {
 
     response.json({
       ready: true,
-      products: [...PRODUCTS],
+      products: PRODUCTS.map(({ file: _file, ...product }) => product),
+      seriesSize: SERIES_SIZE,
       chainId: settings.chainId,
       token: { address: settings.tokenAddress, ...token },
     } satisfies ShopView);

@@ -1,3 +1,6 @@
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { readSignerSettings } from "../config/settings.js";
@@ -7,6 +10,17 @@ import { createApp } from "./app.js";
 
 const ADMIN_TOKEN = "admin-token-0123456789";
 const TX = `0x${"ab".repeat(32)}`;
+
+const FILE_BYTES = "not really a png";
+
+/** A folder with the first wallpaper's file, so the download route has something to send. */
+function wallpapersDir(): string {
+  const dir = mkdtempSync(join(tmpdir(), "wallpapers-"));
+
+  writeFileSync(join(dir, "01-beograd-genex-4k.png"), FILE_BYTES);
+
+  return dir;
+}
 
 async function readyApp(clientIpHeader: string | null = null) {
   const harness = await testShop();
@@ -20,6 +34,7 @@ async function readyApp(clientIpHeader: string | null = null) {
     signerList: { ok: true, value: buildSignerList(signer.value) },
     adminToken: ADMIN_TOKEN,
     clientIpHeader,
+    wallpapersDir: wallpapersDir(),
     log,
   });
 
@@ -34,7 +49,7 @@ describe("the signer list", () => {
     expect(response.status).toBe(200);
     expect(response.headers["access-control-allow-origin"]).toBe("*");
     expect(response.body.signers[0].address).toBe(signer.signerAddress);
-    expect(response.body).toMatchObject({ name: "Overprint", icon: "/curvy-icon.png" });
+    expect(response.body).toMatchObject({ name: "Brutalism", icon: "/curvy-icon.png" });
   });
 
   it("is published before the rest of the shop is set up", async () => {
@@ -46,6 +61,7 @@ describe("the signer list", () => {
       shop: { ok: false, problems: ["CHAIN_ID is required"] },
       signerList: { ok: true, value: buildSignerList(signer.value) },
       adminToken: null,
+      wallpapersDir: wallpapersDir(),
       log: new MemoryLog(),
     });
 
@@ -56,7 +72,7 @@ describe("the signer list", () => {
       problems: ["CHAIN_ID is required"],
     });
 
-    const order = await request(app).post("/api/orders").send({ productId: "sticker-sheet" });
+    const order = await request(app).post("/api/orders").send({ productId: "01-beograd-genex" });
 
     expect(order.status).toBe(503);
     expect(order.body.code).toBe("NOT_SET_UP");
@@ -66,7 +82,8 @@ describe("the signer list", () => {
 describe("buying", () => {
   it("creates an order, remembers it in a cookie and sends the buyer to checkout", async () => {
     const { app } = await readyApp();
-    const response = await request(app).post("/api/orders").send({ productId: "sticker-sheet" });
+
+    const response = await request(app).post("/api/orders").send({ productId: "01-beograd-genex" });
 
     expect(response.status).toBe(201);
     expect(response.body.checkoutUrl).toMatch(/^https:\/\/checkout\.example\/checkout#/);
@@ -82,15 +99,17 @@ describe("buying", () => {
     const response = await request(app)
       .post("/api/orders")
       .type("form")
-      .send("productId=sticker-sheet");
+      .send("productId=01-beograd-genex");
 
     expect(response.status).toBe(415);
   });
 
   it("shows the order and accepts the return URL's transaction hash", async () => {
     const { app, payments } = await readyApp();
-    const created = await request(app).post("/api/orders").send({ productId: "postcard-set" });
+
+    const created = await request(app).post("/api/orders").send({ productId: "01-beograd-genex" });
     // The cookie is Secure (the shop's origin is https), so pass it on by hand over plain http.
+
     const cookie = String(created.headers["set-cookie"]?.[0]).split(";")[0] ?? "";
 
     payments.script = () => ({ status: "paid", payment: verifiedPayment() });
@@ -103,12 +122,59 @@ describe("buying", () => {
     expect(paid.status).toBe(200);
 
     expect(paid.body).toMatchObject({
-      productName: "Postcard set",
+      productName: "Beograd · Genex kula",
       status: "paid",
       chainId: 42161,
     });
 
     expect(paid.body.attempts[0].txHash).toBe(TX);
+  });
+
+  it("sends the file once at the paid order's download link", async () => {
+    const { app, payments } = await readyApp();
+
+    const created = await request(app).post("/api/orders").send({ productId: "01-beograd-genex" });
+
+    const cookie = String(created.headers["set-cookie"]?.[0]).split(";")[0] ?? "";
+
+    payments.script = () => ({ status: "paid", payment: verifiedPayment() });
+
+    const paid = await request(app)
+      .post("/api/orders/current/tx-hash")
+      .set("cookie", cookie)
+      .send({ txHash: TX });
+
+    const url: string = paid.body.download.url;
+
+    expect(url).toMatch(/^\/download\/[0-9a-f]{64}$/);
+    expect(paid.body.download.downloadedAt).toBeNull();
+
+    const file = await request(app).get(url);
+
+    expect(file.status).toBe(200);
+
+    expect(file.headers["content-disposition"]).toContain(
+      "brutalism-store-01-beograd-genex-4k.png",
+    );
+
+    expect(Buffer.from(file.body as Uint8Array).toString()).toBe(FILE_BYTES);
+
+    const again = await request(app).get(url);
+
+    expect(again.status).toBe(410);
+    expect(again.body.code).toBe("DOWNLOAD_USED");
+
+    const shown = await request(app).get("/api/orders/current").set("cookie", cookie);
+
+    expect(shown.body.download.downloadedAt).not.toBeNull();
+  });
+
+  it("has no file for a token nobody was given", async () => {
+    const { app } = await readyApp();
+    const response = await request(app).get(`/download/${"0".repeat(64)}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.code).toBe("NO_DOWNLOAD");
   });
 
   it("has no order for a browser that did not buy anything", async () => {
@@ -137,7 +203,7 @@ describe("the admin API", () => {
   it("runs the payment check on demand", async () => {
     const { app } = await readyApp();
 
-    await request(app).post("/api/orders").send({ productId: "sticker-sheet" });
+    await request(app).post("/api/orders").send({ productId: "01-beograd-genex" });
 
     const run = await request(app)
       .post("/api/admin/check-payments")
@@ -157,7 +223,10 @@ it("answers unknown API routes with JSON", async () => {
 
 describe("limits", () => {
   const buy = (app: Parameters<typeof request>[0], address: string) =>
-    request(app).post("/api/orders").set("x-real-ip", address).send({ productId: "sticker-sheet" });
+    request(app)
+      .post("/api/orders")
+      .set("x-real-ip", address)
+      .send({ productId: "01-beograd-genex" });
 
   it("slow down an address that keeps starting payments, and no one else", async () => {
     const { app } = await readyApp("X-Real-IP");

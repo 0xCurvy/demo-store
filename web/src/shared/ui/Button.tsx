@@ -8,10 +8,10 @@ type ButtonProps = ComponentProps<"button"> & {
 };
 
 const VARIANTS = {
-  primary: "bg-ink text-sheet enabled:hover:-translate-0.5 enabled:hover:shadow-print-pink",
+  primary: "bg-ink text-sheet enabled:hover:-translate-0.5 enabled:hover:shadow-print-red",
   secondary:
     "border-2 border-ink bg-sheet text-ink enabled:hover:-translate-0.5 enabled:hover:shadow-print-ink",
-  quiet: "px-0 text-blue-ink underline decoration-2 underline-offset-4 enabled:hover:text-ink",
+  quiet: "px-0 text-sky-ink underline decoration-2 underline-offset-4 enabled:hover:text-ink",
 };
 
 export function Button({

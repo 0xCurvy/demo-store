@@ -40,7 +40,7 @@ export function AdminSignIn({ problem, onSignIn }: AdminSignInProps) {
             className="min-h-11 w-full rounded-sm border-2 border-ink bg-sheet px-3 font-mono"
           />
           {problem && (
-            <p id="admin-token-problem" role="alert" className="mt-2 text-sm text-pink-ink">
+            <p id="admin-token-problem" role="alert" className="mt-2 text-sm text-red-ink">
               {problem}
             </p>
           )}

@@ -12,7 +12,7 @@ export function TransactionLink({ chainId, txHash }: { chainId: number; txHash: 
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="font-mono text-sm text-blue-ink underline underline-offset-4"
+      className="font-mono text-sm text-sky-ink underline underline-offset-4"
     >
       {shortHex(txHash)}
     </a>

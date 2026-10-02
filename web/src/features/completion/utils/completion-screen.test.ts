@@ -18,7 +18,7 @@ function order(status: OrderView["status"], expiry = NOW + 600): OrderView {
   return {
     id: `0x${"01".repeat(32)}`,
     productName: "Sticker sheet",
-    priceCents: 150,
+    price: "1.337",
     chainId: 11155111,
     token: { address: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238", symbol: "USDC", decimals: 6 },
     amount: "1500000",
@@ -26,6 +26,7 @@ function order(status: OrderView["status"], expiry = NOW + 600): OrderView {
     attempts: [attempt],
     createdAt: "2026-09-29T12:00:00.000Z",
     paidAt: null,
+    download: null,
   };
 }
 

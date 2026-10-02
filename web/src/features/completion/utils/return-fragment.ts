@@ -14,7 +14,7 @@ export interface ReturnFragment {
   retry: string | null;
 }
 
-const HINT_KEY = "overprint:tx-hash";
+const HINT_KEY = "brutalism:tx-hash";
 const TX_HASH = /^0x[0-9a-fA-F]{64}$/;
 
 let taken: ReturnFragment | undefined;

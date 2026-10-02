@@ -4,3 +4,5 @@ dist
 .env
 *.secret.json
 .DS_Store
+# The 4K files are the goods: keep them out of the public repository.
+wallpapers/*.png

@@ -39,7 +39,7 @@ export function AttemptDetails(props: AttemptDetailsProps) {
         <StatusLabel status={attempt.status} />
         {attempt.txHash && <TransactionLink chainId={chainId} txHash={attempt.txHash} />}
         {!attempt.lastCheckOk && attempt.checkedAt && (
-          <span className="text-sm text-pink-ink">The last check did not reach the chain.</span>
+          <span className="text-sm text-red-ink">The last check did not reach the chain.</span>
         )}
       </div>
 
@@ -53,7 +53,7 @@ export function AttemptDetails(props: AttemptDetailsProps) {
       </dl>
 
       {attempt.siblingNoteIds.length > 0 && (
-        <p className="text-sm text-pink-ink">
+        <p className="text-sm text-red-ink">
           More than one payment arrived for this reference. Only one can be spent: review this
           order.
         </p>
@@ -70,7 +70,7 @@ export function AttemptDetails(props: AttemptDetailsProps) {
           href={attempt.checkoutUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-block text-sm font-semibold text-blue-ink underline underline-offset-4"
+          className="inline-block text-sm font-semibold text-sky-ink underline underline-offset-4"
         >
           Open the checkout link
         </a>

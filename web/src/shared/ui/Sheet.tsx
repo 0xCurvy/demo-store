@@ -3,13 +3,13 @@ import { cn } from "@/shared/lib/cn";
 
 type SheetProps = ComponentProps<"section"> & {
   /** The spot colour printed a little off, behind the sheet. */
-  offset?: "blue" | "pink" | "yellow" | "ink" | "none";
+  offset?: "sky" | "red" | "ochre" | "ink" | "none";
 };
 
 const OFFSETS = {
-  blue: "shadow-print-blue",
-  pink: "shadow-print-pink",
-  yellow: "shadow-print-yellow",
+  sky: "shadow-print-sky",
+  red: "shadow-print-red",
+  ochre: "shadow-print-ochre",
   ink: "shadow-print-ink",
   none: "",
 };

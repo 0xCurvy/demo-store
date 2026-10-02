@@ -4,7 +4,7 @@ import { useAdminOverview } from "@/features/admin/hooks/useAdminOverview";
 import { useAdminToken } from "@/features/admin/hooks/useAdminToken";
 import { ApiRequestError, errorMessage } from "@/shared/api/client";
 import { Notice } from "@/shared/ui/Notice";
-import { OverprintLoader } from "@/shared/ui/OverprintLoader";
+import { ShopLoader } from "@/shared/ui/ShopLoader";
 import { SetupNeeded } from "@/shared/ui/SetupNeeded";
 
 /** The shop owner's view of orders, at /admin. */
@@ -40,7 +40,7 @@ export function AdminPage() {
     );
   }
 
-  if (!overview.data) return <OverprintLoader label="Loading orders" />;
+  if (!overview.data) return <ShopLoader label="Loading orders" />;
 
   return (
     <AdminDashboard

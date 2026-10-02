@@ -1,5 +1,6 @@
 /** Rules for an order as a whole, derived from its attempts. */
 import { attemptStatus, readRecord } from "./attempt.js";
+import { issueDownload } from "./download.js";
 import { type Attempt, type AttemptStatus, OPEN_STATUSES, type Order } from "./order.js";
 
 /** The order shows its most advanced attempt: one paid attempt pays the order. */
@@ -14,7 +15,8 @@ const STATUS_ORDER: readonly AttemptStatus[] = [
 
 /**
  * Recompute the order's status. Returns true when this call marked the order paid for the first
- * time: that is the one moment the order is fulfilled, recorded as `fulfilledAt` in the same write.
+ * time: that is the one moment the order is fulfilled, recorded as `fulfilledAt` and the download
+ * link issued, in the same write.
  */
 export function updateOrderStatus(order: Order, now = new Date()): boolean {
   const statuses = new Set(order.attempts.map(attemptStatus));
@@ -25,6 +27,7 @@ export function updateOrderStatus(order: Order, now = new Date()): boolean {
 
   order.paidAt ??= now.toISOString();
   order.fulfilledAt = now.toISOString();
+  order.download ??= issueDownload(now);
 
   return true;
 }

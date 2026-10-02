@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const KEY = "overprint:admin-token";
+const KEY = "brutalism:admin-token";
 
 function read(): string | null {
   try {

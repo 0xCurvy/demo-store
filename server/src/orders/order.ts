@@ -7,6 +7,7 @@
  * that record, never kept beside it.
  */
 import type { Address, Hex } from "viem";
+import type { Download } from "./download.js";
 
 /**
  * Where a payment attempt stands.
@@ -42,7 +43,8 @@ export interface Order {
   id: Hex;
   productId: string;
   productName: string;
-  priceCents: number;
+  /** In US dollars, as a decimal string. */
+  price: string;
   token: { address: Address; symbol: string; decimals: number };
   /** What the buyer pays, in token base units (a decimal string). */
   amount: string;
@@ -52,6 +54,8 @@ export interface Order {
   paidAt: string | null;
   /** Set once, in the same write that first marks the order paid. */
   fulfilledAt: string | null;
+  /** The one-time link to the file, issued in that same write. */
+  download: Download | null;
 }
 
 /** A payment can land shortly after its link closes, so the shop keeps looking this much longer. */

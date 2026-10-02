@@ -20,11 +20,16 @@ export function OrderRow({ order, paidOnCommit, nowSeconds }: OrderRowProps) {
         <td className="py-3 pr-4">
           <p className="font-semibold">{order.productName}</p>
           <p className="font-mono text-xs text-ink-muted">{shortHex(order.id)}</p>
+          {order.downloadedAt && (
+            <p className="mt-1 text-xs text-green-ink">
+              Downloaded {formatDateTime(order.downloadedAt)}
+            </p>
+          )}
         </td>
         <td className="py-3 pr-4">
           <StatusLabel status={order.status} />
         </td>
-        <td className="py-3 pr-4 tabular-nums">{formatPrice(order.priceCents)}</td>
+        <td className="py-3 pr-4 tabular-nums">{formatPrice(order.price)}</td>
         <td className="py-3 pr-4 tabular-nums">{formatToken(order.netReceived, order.token)}</td>
         <td className="py-3 pr-4 whitespace-nowrap">{formatDateTime(order.createdAt)}</td>
         <td className="py-3 text-right">
@@ -33,7 +38,7 @@ export function OrderRow({ order, paidOnCommit, nowSeconds }: OrderRowProps) {
             aria-expanded={open}
             aria-controls={detailsId}
             onClick={() => setOpen(!open)}
-            className="font-semibold text-blue-ink underline underline-offset-4"
+            className="font-semibold text-sky-ink underline underline-offset-4"
           >
             {open ? "Hide" : "Details"}
           </button>

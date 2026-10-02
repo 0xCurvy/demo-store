@@ -8,7 +8,7 @@ export function NotFoundPage() {
       </h1>
       <Link
         to="/"
-        className="mt-6 inline-block font-semibold text-blue-ink underline decoration-2 underline-offset-4"
+        className="mt-6 inline-block font-semibold text-sky-ink underline decoration-2 underline-offset-4"
       >
         Go to the shop
       </Link>

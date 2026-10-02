@@ -16,4 +16,6 @@ export interface OrderRepository {
   recent(limit: number): Promise<Order[]>;
   /** Orders that are not paid yet and still have an attempt worth checking. */
   open(): Promise<Order[]>;
+  /** The order whose download link carries this token. */
+  byDownloadToken(token: string): Promise<Order | null>;
 }

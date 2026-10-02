@@ -2,44 +2,46 @@
 @import "@fontsource-variable/archivo/wdth.css";
 
 /*
- * Overprint's look: a small print shop. Ink on paper, and three spot colours that overlap
- * like layers of printing ink (mix-blend-mode: multiply). Muted text stays above 4.5:1 on paper.
+ * The shop's look follows its wallpapers: cream paper with a little grain, heavy condensed black type like the
+ * city names on each poster, small tracked mono labels, and the posters' own skies as spot colours (a clear
+ * blue, a red-orange and an ochre) that overlap like silkscreen layers (mix-blend-mode: multiply). Muted text
+ * stays above 4.5:1 on the paper.
  */
 @theme {
   --font-sans: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --color-paper: #eef1f5;
-  --color-sheet: #fbfcfd;
-  --color-ink: #1f2440;
-  --color-ink-muted: #545a73;
-  --color-line: #d3d9e3;
+  --color-paper: #ebe5d6;
+  --color-sheet: #f7f3e9;
+  --color-ink: #141412;
+  --color-ink-muted: #58544a;
+  --color-line: #d4ccb8;
 
-  --color-blue: #0078bf;
-  --color-blue-ink: #005a91;
-  --color-pink: #ff48b0;
-  --color-pink-ink: #b3106c;
-  --color-yellow: #ffe800;
-  --color-green: #00a95c;
-  --color-green-ink: #007541;
+  --color-sky: #2f80ad;
+  --color-sky-ink: #1f5c7e;
+  --color-red: #d9472a;
+  --color-red-ink: #a33015;
+  --color-ochre: #d9a21b;
+  --color-green: #2f7d4f;
+  --color-green-ink: #205a38;
 
-  --shadow-print-blue: 6px 6px 0 0 var(--color-blue);
-  --shadow-print-pink: 6px 6px 0 0 var(--color-pink);
-  --shadow-print-yellow: 6px 6px 0 0 var(--color-yellow);
+  --shadow-print-sky: 6px 6px 0 0 var(--color-sky);
+  --shadow-print-red: 6px 6px 0 0 var(--color-red);
+  --shadow-print-ochre: 6px 6px 0 0 var(--color-ochre);
   --shadow-print-ink: 4px 4px 0 0 var(--color-ink);
 
-  --animate-register: register 1.8s ease-in-out infinite;
+  --animate-settle: settle 1.8s ease-in-out infinite;
 }
 
-/* Two ink layers drifting in and out of registration while the shop waits for a payment. */
-@keyframes register {
+/* A slab lifting off its footing and settling back while the shop waits for a payment. */
+@keyframes settle {
   0%,
   100% {
     transform: translate(0, 0);
   }
 
   50% {
-    transform: translate(7px, 4px);
+    transform: translate(6px, -5px);
   }
 }
 
@@ -49,15 +51,15 @@
     color: var(--color-ink);
   }
 
-  /* A faint paper grain, drawn once as an SVG noise tile. */
+  /* The posters' paper: a faint grain, drawn once as an SVG noise tile. */
   body {
     min-height: 100dvh;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
     -webkit-font-smoothing: antialiased;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-blue);
+    outline: 2px solid var(--color-sky);
     outline-offset: 3px;
   }
 
@@ -70,4 +72,19 @@
       transition-duration: 0.01ms !important;
     }
   }
+}
+
+@utility poster-title {
+  font-stretch: 80%;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+@utility poster-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }

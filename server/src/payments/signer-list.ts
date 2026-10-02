@@ -7,7 +7,7 @@ import { buildMerchantKeySet } from "@0xcurvy/payments-sdk/merchant/keys";
 import type { SignerSettings } from "../config/settings.js";
 
 /** How checkout names the shop; it shows the shop's address beside it. */
-export const CHECKOUT_NAME = "Overprint";
+export const CHECKOUT_NAME = "Brutalism";
 
 /** Shown next to the shop's name in checkout: a square PNG in web/public, served from the shop's own origin. */
 export const CHECKOUT_ICON = "/curvy-icon.png";

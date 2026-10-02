@@ -10,7 +10,13 @@ import {
 } from "@0xcurvy/payments-sdk/merchant";
 import { buildCheckoutUrl } from "@0xcurvy/payments-sdk/transport";
 import { bytesToHex, type Hex } from "viem";
-import { amountForPrice, findProduct, paymentDescription } from "../catalog/products.js";
+import {
+  amountForPrice,
+  assertSellable,
+  findProduct,
+  paymentDescription,
+  productName,
+} from "../catalog/products.js";
 import type { ShopSettings } from "../config/settings.js";
 import { ShopError } from "../errors.js";
 import type { Log } from "../log.js";
@@ -97,14 +103,16 @@ export function createOrderService(deps: OrderServiceDeps) {
     }
 
     const token = await network.token();
-    const amount = amountForPrice(product.priceCents, token.decimals);
+    assertSellable(product.price, token.decimals);
+
+    const amount = amountForPrice(product.price, token.decimals);
     const attempt = await newAttempt(amount, 1, paymentDescription(product));
 
     const order: Order = {
       id: bytesToHex(randomBytes(32)),
       productId: product.id,
-      productName: product.name,
-      priceCents: product.priceCents,
+      productName: productName(product),
+      price: product.price,
       token: { address: settings.tokenAddress, ...token },
       amount: amount.toString(),
       status: "processing",
@@ -112,6 +120,7 @@ export function createOrderService(deps: OrderServiceDeps) {
       createdAt: new Date(now()).toISOString(),
       paidAt: null,
       fulfilledAt: null,
+      download: null,
     };
 
     await repository.create(order);

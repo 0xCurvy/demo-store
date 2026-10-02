@@ -19,15 +19,28 @@ export interface TokenView {
 
 export interface ProductView {
   id: string;
-  name: string;
-  description: string;
-  priceCents: number;
-  artwork: "print" | "stickers" | "postcards";
+  /** Its place in the series of ten. */
+  number: number;
+  city: string;
+  subject: string;
+  note: string;
+  /** In US dollars, as a decimal string: "1.337". */
+  price: string;
+  /** The 600 × 400 preview, served from the shop's own origin. */
+  thumbnail: string;
+}
+
+/** The buyer's one-time link to the 4K file, on a paid order. */
+export interface DownloadView {
+  url: string;
+  expiresAt: string;
+  /** Set once the file has been sent in full; the link no longer works. */
+  downloadedAt: string | null;
 }
 
 /** GET /api/shop. Before the shop is set up it lists what is missing instead. */
 export type ShopView =
-  | { ready: true; products: ProductView[]; chainId: number; token: TokenView }
+  | { ready: true; products: ProductView[]; seriesSize: number; chainId: number; token: TokenView }
   | { ready: false; problems: string[] };
 
 /** POST /api/orders */
@@ -52,7 +65,7 @@ export interface AttemptView {
 export interface OrderView {
   id: string;
   productName: string;
-  priceCents: number;
+  price: string;
   chainId: number;
   token: TokenView;
   amount: string;
@@ -60,6 +73,7 @@ export interface OrderView {
   attempts: AttemptView[];
   createdAt: string;
   paidAt: string | null;
+  download: DownloadView | null;
 }
 
 /** POST /api/orders/current/attempts */
@@ -79,8 +93,10 @@ export interface AdminAttemptView extends AttemptView {
   checkoutUrl: string;
 }
 
-export interface AdminOrderView extends Omit<OrderView, "attempts"> {
+export interface AdminOrderView extends Omit<OrderView, "attempts" | "download"> {
   fulfilledAt: string | null;
+  /** When the buyer finished downloading the file; the link is never shown here. */
+  downloadedAt: string | null;
   netReceived: string;
   attempts: AdminAttemptView[];
 }

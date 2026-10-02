@@ -16,8 +16,8 @@ export function NetworkNote({ chainId, token }: { chainId: number; token: TokenV
 
   return (
     <Notice tone="warning" title={`Real money on ${chain.name}`}>
-      Payments are in {token.symbol} and cannot be refunded by the shop. Nothing here ships: buy
-      only to try Curvy checkout.
+      Payments are in {token.symbol} and cannot be refunded by the shop. What you get is the 4K
+      file, and a story to tell about Curvy checkout.
     </Notice>
   );
 }

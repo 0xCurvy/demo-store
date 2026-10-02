@@ -1,8 +1,14 @@
-/** Prices are in US cents; token amounts are base-unit strings, formatted with the token's decimals. */
+/** Prices are dollar amounts as decimal strings; token amounts are base-unit strings, formatted with the token's decimals. */
 import type { TokenView } from "@api";
 
-export function formatPrice(cents: number): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+/** "1.337" → "$1.337"; "1.5" → "$1.50". Display only: the exact amount is the token amount. */
+export function formatPrice(price: string): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 6,
+  }).format(Number(price));
 }
 
 /** 3950000 with 6 decimals → "3.95". Keeps at least two decimals and drops trailing zeros. */

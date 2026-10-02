@@ -107,6 +107,7 @@ describe("server settings", () => {
         adminToken: null,
         checkPaymentsEverySeconds: 30,
         clientIpHeader: null,
+        wallpapersDir: "wallpapers",
       },
     });
   });

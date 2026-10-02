@@ -13,7 +13,7 @@ export function Notice({ tone = "info", title, children }: NoticeProps) {
       role={tone === "warning" ? "alert" : "status"}
       className={cn(
         "border-l-4 bg-sheet px-4 py-3 text-sm leading-relaxed",
-        tone === "warning" ? "border-pink" : "border-blue",
+        tone === "warning" ? "border-red" : "border-sky",
       )}
     >
       {title && <p className="mb-1 font-semibold">{title}</p>}
