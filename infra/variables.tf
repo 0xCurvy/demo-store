@@ -43,9 +43,10 @@ variable "environments" {
       curvy_environment  = "mainnet"
       curvy_api_url      = "https://api.curvy.box"
       checkout_url       = "https://app.curvy.box/checkout"
-      receiving_keys     = ""
-      chain_id           = ""
-      aggregator_address = ""
+      receiving_keys     = "01Q1JLFcflKpzdXgiNmbbd6WQtyyNUr6C2hWC1XTJi3KQ"
+      chain_id           = "42161"
+      tokens             = "USDC"
+      aggregator_address = "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953"
       tokens             = "USDC"
     }
     development = {

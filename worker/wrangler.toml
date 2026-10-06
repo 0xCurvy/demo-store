@@ -59,9 +59,9 @@ MERCHANT_ORIGIN = "https://brutalism.store"
 CURVY_ENVIRONMENT = "mainnet"
 CURVY_API_URL = "https://api.curvy.box"
 CHECKOUT_URL = "https://app.curvy.box/checkout"
-CURVY_PAYMENTS_PUBLIC_KEY = ""
-CHAIN_ID = ""
-AGGREGATOR_ADDRESS = ""
+CURVY_PAYMENTS_PUBLIC_KEY = "01Q1JLFcflKpzdXgiNmbbd6WQtyyNUr6C2hWC1XTJi3KQ"
+CHAIN_ID = "42161"
+AGGREGATOR_ADDRESS = "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953"
 TOKENS = "USDC"
 
 [[env.production.d1_databases]]
