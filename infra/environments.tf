@@ -41,6 +41,7 @@ resource "local_file" "wrangler" {
         chain_id           = env.chain_id
         aggregator_address = env.aggregator_address
         tokens             = env.tokens
+        x402_recovery      = env.x402_recovery
         d1_id              = cloudflare_d1_database.orders[name].id
         d1_name            = cloudflare_d1_database.orders[name].name
         r2_name            = cloudflare_r2_bucket.wallpapers[name].name

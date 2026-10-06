@@ -87,7 +87,7 @@ describe("buying", () => {
     }>();
 
     expect(paid.status).toBe(200);
-    expect(order).toMatchObject({ status: "paid", productName: "Beograd · Genex kula" });
+    expect(order).toMatchObject({ status: "paid", productName: "Belgrade · Genex Tower" });
     expect(order.download.url).toMatch(/^\/download\/[0-9a-f]{64}$/);
 
     await env.WALLPAPERS.put("01-beograd-genex-4k.png", FILE_BYTES);

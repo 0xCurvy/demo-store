@@ -49,7 +49,7 @@ export function ProductCard(props: ProductCardProps) {
       <div className={cn("flex flex-1 flex-col gap-4 p-5", featured && "lg:justify-center lg:p-8")}>
         <div>
           <p className="flex justify-between poster-label text-ink-muted">
-            <span>Jugoslavija</span>
+            <span>Yugoslavia</span>
             <span>
               {number} / {seriesSize}
             </span>

@@ -42,6 +42,9 @@ export function Layout() {
           <NavLink to="/" end className={navClass}>
             Shop
           </NavLink>
+          <NavLink to="/agents" className={navClass}>
+            For agents
+          </NavLink>
           <a
             href={DOCS_URL}
             target="_blank"

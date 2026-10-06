@@ -101,6 +101,23 @@ export interface AdminOrderView extends Omit<OrderView, "attempts" | "download">
   attempts: AdminAttemptView[];
 }
 
+/** GET /api/agent: what an agent reads before paying. */
+export type { AgentCatalogue, AgentResource } from "../x402/catalogue.js";
+
+/** One agent payment, as the admin page shows it. The `payTo` is public: the agent paid it. */
+export interface AdminAgentPaymentView {
+  payTo: string;
+  status: "pending" | "settling" | "settled" | "shielded" | "confirmed" | "failed" | "expired";
+  resource: string;
+  amount: string;
+  netAmount: string | null;
+  payer: string | null;
+  settleTxHash: string | null;
+  shieldTxHash: string | null;
+  createdAt: string;
+  error: string | null;
+}
+
 /** GET /api/admin/overview */
 export interface AdminOverview {
   settings: {
@@ -118,6 +135,13 @@ export interface AdminOverview {
   };
   totals: { orders: number; paid: number; netReceived: string; token: TokenView | null };
   orders: AdminOrderView[];
+  /** Payments from agents over x402, newest first; `unavailable` says why there can be none right now. */
+  agents: {
+    payments: AdminAgentPaymentView[];
+    confirmed: number;
+    netReceived: string;
+    unavailable: string | null;
+  };
 }
 
 /** POST /api/admin/check-payments */
@@ -128,6 +152,14 @@ export interface PaymentCheckRun {
   failed: number;
   paid: string[];
   skipped: boolean;
+  /** Agent payments pushed forward in the same run. */
+  agents: {
+    payments: number;
+    shielded: number;
+    confirmed: number;
+    refused: number;
+    failed: number;
+  } | null;
 }
 
 /** Every error response. */

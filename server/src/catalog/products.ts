@@ -48,32 +48,32 @@ function wallpaper(
 }
 
 export const PRODUCTS: readonly Product[] = [
-  wallpaper(1, "beograd-genex", "Beograd", "Genex kula", "The Western City Gate, 1980."),
+  wallpaper(1, "beograd-genex", "Belgrade", "Genex Tower", "The Western City Gate, 1980."),
   wallpaper(
     3,
     "tjentiste-sutjeska",
     "Tjentište",
-    "Spomenik na Sutjesci",
+    "Sutjeska monument",
     "The Battle of Sutjeska memorial, 1971.",
   ),
   wallpaper(
     5,
     "petrova-gora-spomenik",
     "Petrova gora",
-    "Spomenik na Petrovcu",
+    "Uprising monument",
     "The Kordun and Banija uprising monument, 1981.",
   ),
-  wallpaper(6, "krusevo-ilinden", "Kruševo", "Ilinden", "The Makedonium, 1974."),
+  wallpaper(6, "krusevo-ilinden", "Kruševo", "Ilinden monument", "The Makedonium, 1974."),
   wallpaper(8, "split-split-3", "Split", "Split 3", "The Split 3 district, 1970s."),
 ];
 
-/** How the order and the receipt name a wallpaper: "Beograd · Genex kula". */
+/** How the order and the receipt name a wallpaper: "Belgrade · Genex Tower". */
 export function productName(product: Pick<Product, "city" | "subject">): string {
   return `${product.city} · ${product.subject}`;
 }
 
 /**
- * What checkout shows the buyer under the shop's name, e.g. "Beograd · Genex kula · 4K wallpaper 01/10". The shop
+ * What checkout shows the buyer under the shop's name, e.g. "Belgrade · Genex Tower · 4K wallpaper 01/10". The shop
  * signs it into the payment (at most 120 characters, plain text), so checkout and its receipt can say what was
  * bought. Checkout never sees the order itself.
  */

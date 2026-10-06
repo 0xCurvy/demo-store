@@ -28,7 +28,7 @@ describe("creating an order", () => {
     expect(signed.intent.merchantOrigin).toBe("https://shop.example");
 
     // Signed, so checkout can show what is being bought.
-    expect(signed.intent.description).toBe("Beograd · Genex kula · 4K wallpaper 01/10");
+    expect(signed.intent.description).toBe("Belgrade · Genex Tower · 4K wallpaper 01/10");
   });
 
   it("refuses an unknown product", async () => {
@@ -185,7 +185,7 @@ describe("a fresh payment attempt", () => {
     expect(updated.attempts.map((attempt) => attempt.number)).toEqual([1, 2]);
 
     expect(decodePaymentIntentFragment(new URL(checkoutUrl).hash).intent.description).toBe(
-      "Beograd · Genex kula · 4K wallpaper 01/10",
+      "Belgrade · Genex Tower · 4K wallpaper 01/10",
     );
   });
 

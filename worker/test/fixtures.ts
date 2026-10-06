@@ -17,6 +17,8 @@ import { createCurvyPayments } from "../../server/src/payments/curvy-payments.js
 import type { PaymentLookup, Payments } from "../../server/src/payments/payments.js";
 import { buildSignerList } from "../../server/src/payments/signer-list.js";
 import { createShop } from "../../server/src/shop.js";
+import { FakeAgentMerchant } from "../../server/src/testing/fake-agent-merchant.js";
+import { D1X402Store } from "../src/d1-x402-store.js";
 import { createApp } from "../src/app.js";
 import { D1OrderRepository } from "../src/d1-repository.js";
 import { rustCoreReady } from "../src/rust-core.js";
@@ -127,7 +129,17 @@ export async function readyApp(overrides: Record<string, string> = {}) {
   const repository = new D1OrderRepository(env.ORDERS);
   const payments = new FakePayments(settings);
   const log = new MemoryLog();
-  const shop = createShop({ settings, signer, repository, payments, log });
+  const agentMerchant = new FakeAgentMerchant();
+
+  const shop = createShop({
+    settings,
+    signer,
+    repository,
+    payments,
+    agentStore: new D1X402Store(env.ORDERS),
+    createMerchant: async () => agentMerchant,
+    log,
+  });
 
   const deps: ShopDeps = {
     state: { ok: true, value: shop },
@@ -136,7 +148,7 @@ export async function readyApp(overrides: Record<string, string> = {}) {
     log,
   };
 
-  return { app: createApp(deps), deps, shop, repository, payments, log, signer };
+  return { app: createApp(deps), deps, shop, repository, payments, agentMerchant, log, signer };
 }
 
 /** An execution context whose background work the test can wait for. */

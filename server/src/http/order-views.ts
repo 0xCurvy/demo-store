@@ -2,7 +2,14 @@
 import { attemptStatus, readRecord } from "../orders/attempt.js";
 import type { Attempt, Order } from "../orders/order.js";
 import { netReceived } from "../orders/order-status.js";
-import type { AdminAttemptView, AdminOrderView, AttemptView, OrderView } from "./contract.js";
+import type { X402Payment } from "@0xcurvy/payments-sdk/x402/merchant";
+import type {
+  AdminAgentPaymentView,
+  AdminAttemptView,
+  AdminOrderView,
+  AttemptView,
+  OrderView,
+} from "./contract.js";
 
 function attemptView(attempt: Attempt): AttemptView {
   const { payment, verification } = readRecord(attempt);
@@ -72,5 +79,20 @@ export function adminOrderView(
     downloadedAt: download?.downloadedAt ?? null,
     netReceived: netReceived(order).toString(),
     attempts,
+  };
+}
+
+export function adminAgentPaymentView(payment: X402Payment): AdminAgentPaymentView {
+  return {
+    payTo: payment.payTo,
+    status: payment.status,
+    resource: payment.resource,
+    amount: payment.amount,
+    netAmount: payment.netAmount ?? null,
+    payer: payment.payer ?? null,
+    settleTxHash: payment.settleTxHash ?? null,
+    shieldTxHash: payment.shieldTxHash ?? null,
+    createdAt: new Date(payment.createdAt).toISOString(),
+    error: payment.error ?? null,
   };
 }

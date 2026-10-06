@@ -6,6 +6,7 @@ import { Notice } from "@/shared/ui/Notice";
 import { useCheckPayments } from "../hooks/useCheckPayments";
 import { OrdersTable } from "./OrdersTable";
 import { ShopSettings } from "./ShopSettings";
+import { AgentPayments } from "./AgentPayments";
 import { Totals } from "./Totals";
 
 type AdminDashboardProps = {
@@ -58,6 +59,7 @@ export function AdminDashboard({ overview, updatedAt, token, onSignOut }: AdminD
         paidOnCommit={overview.settings.paidWhen === "committed"}
         nowSeconds={Math.floor(updatedAt / 1_000)}
       />
+      <AgentPayments agents={overview.agents} token={overview.totals.token} />
       <ShopSettings settings={overview.settings} />
     </div>
   );

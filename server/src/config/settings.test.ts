@@ -135,6 +135,7 @@ describe("server settings", () => {
       value: {
         port: 3100,
         storeFile: ".data/orders.json",
+        agentStoreFile: ".data/agent-payments.json",
         adminToken: null,
         checkPaymentsEverySeconds: 30,
         clientIpHeader: null,

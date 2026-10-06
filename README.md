@@ -44,6 +44,22 @@ Set `ADMIN_TOKEN` to see every order and payment attempt at <http://localhost:31
 
 If Curvy cannot take a payment, or the link expires, checkout sends the buyer back with `#retry=…` and the shop starts a fresh payment attempt for the same order.
 
+## Agents pay over x402
+
+Every wallpaper is also a paid HTTP resource. `GET /api/agent` is the free catalogue: each wallpaper's resource
+URL, the price, the network, the token and the schemes on offer. `GET /api/agent/wallpapers/<id>` answers 402
+with a `PAYMENT-REQUIRED` header (x402 v2) naming a one-time `payTo` address; the agent pays it and asks again
+with `PAYMENT-SIGNATURE`, and the 200 body is the PNG. The `/agents` page has the steps and working code; `/llms.txt`
+says the same to crawlers.
+
+The shop uses `createX402Merchant` from `@0xcurvy/payments-sdk/x402/merchant` with Curvy's portal broadcaster on
+the configured stack and shielding driven by the shop itself: the Node server sweeps in-flight agent payments in
+its background check, the Worker in its cron trigger, and both push a freshly paid one forward right after serving
+it. Payments live in `AGENT_STORE_FILE` on the Node server and in D1 on the Worker. Two schemes: `exact`, where the
+agent signs an EIP-3009 authorization and Curvy's facilitator settles it, and `curvy-transfer`, where the agent
+sends the USDC itself. `exact` is offered only when the facilitator advertises it. Set `X402_RECOVERY_ADDRESS` to a
+wallet you control before taking real agent payments: funds the broadcaster refuses are otherwise lost.
+
 ## Where things are
 
 ```
@@ -60,6 +76,10 @@ server/src/
     order-status.ts        the order's status, and when it counts as paid
     fulfilment.ts          the one place an order is fulfilled
     download.ts            the one-time download link a paid order gets
+  x402/
+    agent-payments.ts      agent payments over x402: charge, settle, sweep, on the SDK's merchant
+    catalogue.ts           what an agent reads before paying
+    json-file-store.ts     agent payments in a JSON file (the Worker keeps them in D1)
   payments/
     curvy-payments.ts      the Payments SDK and the chain, behind one interface
     signer-list.ts         the /.well-known/curvy-payments.json document and checkout icon

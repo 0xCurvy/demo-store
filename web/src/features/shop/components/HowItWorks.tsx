@@ -22,7 +22,7 @@ const MARKS = ["bg-sky text-sheet", "bg-red text-ink", "bg-ochre text-ink"];
 export function HowItWorks() {
   return (
     <section aria-labelledby="how-it-works">
-      <p className="border-b-2 border-ink pb-3 poster-label text-ink-muted">Kako se plaća</p>
+      <p className="border-b-2 border-ink pb-3 poster-label text-ink-muted">How to pay</p>
       <h2 id="how-it-works" className="mt-6 text-4xl poster-title">
         How paying works
       </h2>

@@ -32,6 +32,8 @@ variable "environments" {
     chain_id           = string
     aggregator_address = string
     tokens             = string
+    # A wallet the shop controls, to recover agent payments the broadcaster refuses to shield. Empty: none.
+    x402_recovery = string
   }))
   default = {
     production = {
@@ -46,6 +48,7 @@ variable "environments" {
       receiving_keys     = "01Q1JLFcflKpzdXgiNmbbd6WQtyyNUr6C2hWC1XTJi3KQ-fpcVXFxVYxca1yyURa2b-JG7xIvHO58IM8SltvpCMxgg0S9OArWvJjkNVhwY6Qa-DPA-1exKO85lYSgLvHE1_9fBGB8LqbOQxB06_THBCN3Vta9RxlUwVgvTwoG0iNeQRwYV6_f2YRIF4qMVIN8QPvL6xQZTU4ZjUOUMD6mUCNtlvChNGc4Y1LA4VE2WN4VA2Q_RyTjao6C_wx0mBvIWJnGygwMBGQ"
       chain_id           = ""
       tokens             = "USDC"
+      x402_recovery      = ""
       aggregator_address = ""
     }
     development = {
@@ -62,6 +65,7 @@ variable "environments" {
       chain_id           = "42161"
       aggregator_address = "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953"
       tokens             = "USDC"
+      x402_recovery      = ""
     }
   }
 }

@@ -14,6 +14,7 @@ import { consoleLog, type Log } from "../../server/src/log.js";
 import { buildSignerList } from "../../server/src/payments/signer-list.js";
 import { createShop } from "../../server/src/shop.js";
 import { D1OrderRepository } from "./d1-repository.js";
+import { D1X402Store } from "./d1-x402-store.js";
 import { type Env, environmentValues } from "./env.js";
 
 export interface ShopDeps {
@@ -41,7 +42,13 @@ export function shopFor(env: Env): ShopDeps {
     settings.ok && signer.ok
       ? {
           ok: true,
-          value: createShop({ settings: settings.value, signer: signer.value, repository, log }),
+          value: createShop({
+            settings: settings.value,
+            signer: signer.value,
+            repository,
+            agentStore: new D1X402Store(env.ORDERS),
+            log,
+          }),
         }
       : { ok: false, problems: settings.ok ? [] : settings.problems };
 

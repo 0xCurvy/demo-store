@@ -4,6 +4,7 @@
  */
 import { DEFAULT_CHECKOUT_COMPLETE_PATH } from "@0xcurvy/payments-sdk";
 import { initialize, type PaidWhen, type PaymentSDKConfig } from "@0xcurvy/payments-sdk/merchant";
+import type { X402Scheme } from "@0xcurvy/payments-sdk/x402/merchant";
 import type { Address, Hex } from "viem";
 import { privateKeyToAddress } from "viem/accounts";
 import { z } from "zod";
@@ -49,12 +50,18 @@ export interface ShopSettings {
   paymentTtlSeconds: number;
   /** Unpaid orders the shop keeps open at once; past this, new orders wait. */
   maxOpenOrders: number;
+  /** How agents may pay over x402, in order of preference. */
+  x402Schemes: X402Scheme[];
+  /** Where funds the broadcaster refuses to shield can be recovered to; unset, such funds are lost. */
+  x402Recovery: Address | null;
 }
 
 /** How this process runs. Every value has a default. */
 export interface ServerSettings {
   port: number;
   storeFile: string;
+  /** Where the Node server keeps agent payments; the Worker keeps them in D1. */
+  agentStoreFile: string;
   adminToken: string | null;
   checkPaymentsEverySeconds: number;
   /** The header a proxy in front of the shop puts the visitor's address in; null reads the connection. */
@@ -97,11 +104,22 @@ const shopSchema = z.object({
     // An hour leaves time to pay from an exchange; checkout offers that only while 30 minutes are left.
     .default(3_600),
   MAX_OPEN_ORDERS: field.positiveInteger.default(200),
+  // Agent payments over x402: `exact` needs Curvy's facilitator to offer it, `curvy-transfer` needs nothing.
+  X402_SCHEMES: field.list
+    .pipe(
+      z.array(
+        z.enum(["exact", "curvy-transfer"], { error: "must list exact and/or curvy-transfer" }),
+      ),
+    )
+    .default(["exact", "curvy-transfer"]),
+  // A wallet you control, to recover funds the broadcaster refuses to shield. Strongly advised in production.
+  X402_RECOVERY_ADDRESS: field.address.optional(),
 });
 
 const serverSchema = z.object({
   PORT: field.positiveInteger.default(3100),
   STORE_FILE: z.string().default(".data/orders.json"),
+  AGENT_STORE_FILE: z.string().default(".data/agent-payments.json"),
   ADMIN_TOKEN: field.secret.optional(),
   CHECK_PAYMENTS_EVERY_SECONDS: field.positiveInteger.default(30),
   CLIENT_IP_HEADER: field.headerName.optional(),
@@ -202,6 +220,8 @@ export function readShopSettings(env: Env): Settings<ShopSettings> {
     completePath: DEFAULT_CHECKOUT_COMPLETE_PATH,
     paymentTtlSeconds: values.PAYMENT_TTL_SECONDS,
     maxOpenOrders: values.MAX_OPEN_ORDERS,
+    x402Schemes: values.X402_SCHEMES,
+    x402Recovery: values.X402_RECOVERY_ADDRESS ?? null,
   }));
 }
 
@@ -209,6 +229,7 @@ export function readServerSettings(env: Env): Settings<ServerSettings> {
   return read(serverSchema, env, (values) => ({
     port: values.PORT,
     storeFile: values.STORE_FILE,
+    agentStoreFile: values.AGENT_STORE_FILE,
     adminToken: values.ADMIN_TOKEN ?? null,
     checkPaymentsEverySeconds: values.CHECK_PAYMENTS_EVERY_SECONDS,
     clientIpHeader: values.CLIENT_IP_HEADER ?? null,

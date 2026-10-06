@@ -122,7 +122,7 @@ describe("buying", () => {
     expect(paid.status).toBe(200);
 
     expect(paid.body).toMatchObject({
-      productName: "Beograd · Genex kula",
+      productName: "Belgrade · Genex Tower",
       status: "paid",
       chainId: 42161,
     });

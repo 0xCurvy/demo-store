@@ -8,10 +8,31 @@ import { Router } from "express";
 import { netReceived } from "../../orders/order-status.js";
 import { requireAdmin } from "../admin-auth.js";
 import type { AdminOverview, PaymentCheckRun } from "../contract.js";
-import { adminOrderView } from "../order-views.js";
+import { adminAgentPaymentView, adminOrderView } from "../order-views.js";
 import { requireShop, type ShopState } from "../shop-state.js";
+import type { Shop } from "../../shop.js";
 
 const RECENT_ORDERS = 100;
+
+/** Agent payments, newest first, with what the confirmed ones brought in. */
+export async function agentsOverview(agents: Shop["agents"]): Promise<AdminOverview["agents"]> {
+  const availability = await agents.availability();
+
+  if ("unavailable" in availability) {
+    return { payments: [], confirmed: 0, netReceived: "0", unavailable: availability.unavailable };
+  }
+
+  const payments = (await agents.list()).sort((left, right) => right.createdAt - left.createdAt);
+  const confirmed = payments.filter((payment) => payment.status === "confirmed");
+  const net = confirmed.reduce((sum, payment) => sum + BigInt(payment.netAmount ?? "0"), 0n);
+
+  return {
+    payments: payments.map(adminAgentPaymentView),
+    confirmed: confirmed.length,
+    netReceived: net.toString(),
+    unavailable: null,
+  };
+}
 
 export function adminRoutes(state: ShopState, adminToken: string | null): Router {
   const router = Router();
@@ -24,6 +45,7 @@ export function adminRoutes(state: ShopState, adminToken: string | null): Router
     const recent = await repository.recent(RECENT_ORDERS);
     const paid = recent.filter((order) => order.status === "paid");
     const paidNet = paid.reduce((sum, order) => sum + netReceived(order), 0n);
+    const agents = await agentsOverview(shop.agents);
 
     response.json({
       settings: {
@@ -46,6 +68,7 @@ export function adminRoutes(state: ShopState, adminToken: string | null): Router
         token: recent[0]?.token ?? null,
       },
       orders: recent.map((order) => adminOrderView(order, settings.chainId, orders.checkoutUrl)),
+      agents,
     } satisfies AdminOverview);
   });
 

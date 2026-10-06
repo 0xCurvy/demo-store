@@ -18,6 +18,7 @@ import { consoleLog as log } from "./log.js";
 import { buildSignerList } from "./payments/signer-list.js";
 import { createShop, type Shop } from "./shop.js";
 import { JsonFileRepository } from "./storage/json-file-repository.js";
+import { JsonFileX402Store } from "./x402/json-file-store.js";
 
 const PROJECT_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const dev = process.argv.includes("--dev");
@@ -42,12 +43,19 @@ if (!server.ok) exitWith(server.problems);
 const signer = readSignerSettings(process.env);
 const shopSettings = readShopSettings(process.env);
 const repository = new JsonFileRepository(resolve(PROJECT_ROOT, server.value.storeFile));
+const agentStore = new JsonFileX402Store(resolve(PROJECT_ROOT, server.value.agentStoreFile));
 
 const shop: Settings<Shop> =
   shopSettings.ok && signer.ok
     ? {
         ok: true,
-        value: createShop({ settings: shopSettings.value, signer: signer.value, repository, log }),
+        value: createShop({
+          settings: shopSettings.value,
+          signer: signer.value,
+          repository,
+          agentStore,
+          log,
+        }),
       }
     : { ok: false, problems: shopSettings.ok ? [] : shopSettings.problems };
 

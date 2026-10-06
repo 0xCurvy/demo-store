@@ -6,6 +6,7 @@ import { ShopError } from "../errors.js";
 import type { Log } from "../log.js";
 import { errorHandler } from "./error-handler.js";
 import { adminRoutes } from "./routes/admin.js";
+import { agentRoutes } from "./routes/agent.js";
 import { currentOrderRoutes } from "./routes/current-order.js";
 import { downloadRoutes } from "./routes/download.js";
 import { healthRoutes } from "./routes/health.js";
@@ -46,6 +47,7 @@ export function createApp(options: AppOptions): express.Express {
   app.use(currentOrderRoutes(shop));
   app.use(adminRoutes(shop, adminToken));
   app.use(healthRoutes(shop));
+  app.use(agentRoutes(shop, wallpapersDir));
   app.use(downloadRoutes(shop, wallpapersDir, log));
 
   app.use("/api", () => {

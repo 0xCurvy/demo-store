@@ -7,7 +7,7 @@ function order(id: string, overrides: Partial<Order> = {}): Order {
   return {
     id: `0x${id.padStart(64, "0")}` as Order["id"],
     productId: "01-beograd-genex",
-    productName: "Beograd · Genex kula",
+    productName: "Belgrade · Genex Tower",
     price: "1.337",
     token: { address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", symbol: "USDC", decimals: 6 },
     amount: "1337000",

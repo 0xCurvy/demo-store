@@ -1,0 +1,17 @@
+# Brutalism.store
+
+> Five 4K wallpapers (3840 × 2560 PNG) of Yugoslav brutalist architecture, sold for USDC on Arbitrum One through Curvy. Humans pay on a hosted checkout page; agents pay over HTTP 402 (x402 v2).
+
+## For agents
+
+- Catalogue (free): GET /api/agent — every wallpaper as a resource URL with its price, the network (eip155:42161), the token and the schemes offered right now.
+- A wallpaper: GET /api/agent/wallpapers/<id> answers 402 with a PAYMENT-REQUIRED header (base64 JSON, x402 v2). Pay one of its `accepts` rows to the one-time `payTo` address, then GET the same URL with a PAYMENT-SIGNATURE header. The 200 body is the PNG.
+- Schemes: `exact` (EIP-3009 authorization settled by Curvy's facilitator, gasless for the agent) when the facilitator offers it; `curvy-transfer` (a plain ERC-20 transfer of exactly `amount` to `payTo`, present the transaction hash) always.
+- Price: 1.337 USDC per wallpaper, one payment per download. Pay the exact amount.
+- Instructions with code: /agents
+
+## For people
+
+- Shop: /
+- How Curvy checkout works: https://docs.curvy.box/sdk/payments/human-checkout
+- How agent payments work: https://docs.curvy.box/sdk/payments/x402

@@ -8,7 +8,12 @@ import { Hono, type MiddlewareHandler } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { getCookie, setCookie } from "hono/cookie";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { PRODUCTS, SERIES_SIZE } from "../../server/src/catalog/products.js";
+import {
+  downloadName,
+  findProduct,
+  PRODUCTS,
+  SERIES_SIZE,
+} from "../../server/src/catalog/products.js";
 import { SetupError, ShopError } from "../../server/src/errors.js";
 import type {
   AdminOverview,
@@ -18,9 +23,15 @@ import type {
   ShopView,
 } from "../../server/src/http/contract.js";
 import { adminOrderView, orderView } from "../../server/src/http/order-views.js";
+import { agentsOverview } from "../../server/src/http/routes/admin.js";
 import { requireShop } from "../../server/src/http/shop-state.js";
 import { describeError } from "../../server/src/log.js";
 import { netReceived } from "../../server/src/orders/order-status.js";
+import {
+  AGENT_PATH,
+  AGENT_WALLPAPERS_PATH,
+  agentCatalogue,
+} from "../../server/src/x402/catalogue.js";
 import { serveDownload } from "./download.js";
 import type { Env } from "./env.js";
 import { toErrorResponse } from "./errors.js";
@@ -200,6 +211,7 @@ export function createApp(deps: ShopDeps): App {
         token: recent[0]?.token ?? null,
       },
       orders: recent.map((order) => adminOrderView(order, settings.chainId, orders.checkoutUrl)),
+      agents: await agentsOverview(shop.agents),
     } satisfies AdminOverview);
   });
 
@@ -223,6 +235,68 @@ export function createApp(deps: ShopDeps): App {
     } catch (error) {
       return c.json({ ok: false, setUp: true, error: describeError(error) }, 503);
     }
+  });
+
+  // Wallpapers for agents, over x402: the catalogue is free; a wallpaper answers 402 until it is paid.
+  for (const path of [AGENT_PATH, AGENT_WALLPAPERS_PATH]) {
+    app.get(path, async (c) => {
+      const shop = requireShop(state);
+      const token = await shop.network.token();
+
+      c.header("Cache-Control", "no-store");
+
+      return c.json(agentCatalogue(shop.settings, token, await shop.agents.availability()));
+    });
+  }
+
+  app.get(`${AGENT_WALLPAPERS_PATH}/:id`, async (c) => {
+    const shop = requireShop(state);
+    const product = findProduct(c.req.param("id"));
+
+    if (!product) throw new ShopError(404, "there is no such wallpaper", "NO_RESOURCE");
+
+    const token = await shop.network.token();
+
+    const result = await shop.agents
+      .charge(c.req.raw, product, token.decimals)
+      .catch((error: unknown) => {
+        throw new ShopError(
+          503,
+          `agent payments are not available: ${describeError(error)}`,
+          "AGENTS_UNAVAILABLE",
+        );
+      });
+
+    if (result.status === "payment-required") {
+      return c.json(result.response.body, 402, result.response.headers);
+    }
+
+    const object = await c.env.WALLPAPERS.get(product.file);
+
+    if (!object) {
+      log.error(
+        `Agent payment ${result.payment.payTo}: the file for ${product.id} is missing in the bucket`,
+      );
+
+      throw new ShopError(
+        500,
+        "The file is missing on the server. Contact the shop.",
+        "FILE_MISSING",
+      );
+    }
+
+    // Paid: the file is the response. Shielding into the shop's note continues after it is sent.
+    c.executionCtx.waitUntil(shop.agents.settle(result.payment.payTo));
+
+    return new Response(object.body, {
+      headers: {
+        ...result.headers,
+        "Content-Type": "image/png",
+        "Content-Length": String(object.size),
+        "Content-Disposition": `attachment; filename="${downloadName(product)}"`,
+        ETag: object.httpEtag,
+      },
+    });
   });
 
   app.all("/api/*", () => {

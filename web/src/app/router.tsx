@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import { AdminPage } from "@/pages/AdminPage";
+import { AgentsPage } from "@/pages/AgentsPage";
 import { CompletionPage } from "@/pages/CompletionPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ShopPage } from "@/pages/ShopPage";
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <ShopPage /> },
       { path: "checkout/complete", element: <CompletionPage /> },
+      { path: "agents", element: <AgentsPage /> },
       { path: "admin", element: <AdminPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],

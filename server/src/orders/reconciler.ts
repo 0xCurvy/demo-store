@@ -5,6 +5,7 @@
 import { describeError, type Log } from "../log.js";
 import type { Payments } from "../payments/payments.js";
 import type { OrderRepository } from "../storage/order-repository.js";
+import type { AgentPayments, SweepSummary } from "../x402/agent-payments.js";
 import { expireIfOverdue, isWorthChecking } from "./attempt.js";
 import type { Order } from "./order.js";
 import { updateOrderStatus } from "./order-status.js";
@@ -21,12 +22,15 @@ export interface ReconcileSummary {
   paid: string[];
   /** Another run was still going, so this one did nothing. */
   skipped: boolean;
+  /** Agent payments pushed forward in the same run; null when none were due or the merchant is unavailable. */
+  agents: SweepSummary | null;
 }
 
 export interface ReconcilerDeps {
   repository: OrderRepository;
   payments: Payments;
   checker: PaymentChecker;
+  agents?: AgentPayments;
   log: Log;
   now?: () => number;
 }
@@ -36,7 +40,7 @@ export type Reconciler = ReturnType<typeof createReconciler>;
 type DueCheck = { orderId: Order["id"]; index: number; checkedAt: number };
 
 export function createReconciler(deps: ReconcilerDeps) {
-  const { repository, payments, checker, log } = deps;
+  const { repository, payments, checker, agents, log } = deps;
   const now = deps.now ?? Date.now;
   let running = false;
 
@@ -82,6 +86,7 @@ export function createReconciler(deps: ReconcilerDeps) {
       failed: 0,
       paid: [],
       skipped: running,
+      agents: null,
     };
 
     if (running) return summary;
@@ -89,6 +94,15 @@ export function createReconciler(deps: ReconcilerDeps) {
     running = true;
 
     try {
+      // Agent payments first: each step is quick, and a note that just shielded shows up in the same run.
+      if (agents) {
+        try {
+          summary.agents = await agents.sweep();
+        } catch (error) {
+          log.warn(`Agent payments were not swept: ${describeError(error)}`);
+        }
+      }
+
       const due = await collectDueChecks(summary);
 
       if (due.length === 0) return summary;

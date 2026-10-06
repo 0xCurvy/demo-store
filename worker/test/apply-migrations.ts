@@ -6,6 +6,7 @@ await applyD1Migrations(env.ORDERS, env.TEST_MIGRATIONS);
 // Every test starts from an empty shop: no orders, no files.
 beforeEach(async () => {
   await env.ORDERS.prepare("DELETE FROM orders").run();
+  await env.ORDERS.prepare("DELETE FROM agent_payments").run();
 
   const files = await env.WALLPAPERS.list();
 

@@ -20,6 +20,8 @@ export interface Env {
   PAID_WHEN?: string;
   PAYMENT_TTL_SECONDS?: string;
   MAX_OPEN_ORDERS?: string;
+  X402_SCHEMES?: string;
+  X402_RECOVERY_ADDRESS?: string;
 }
 
 /** The string values of the environment, in the shape the server's settings readers take. */

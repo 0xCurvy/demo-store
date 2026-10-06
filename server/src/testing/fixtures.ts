@@ -23,6 +23,9 @@ import { createCurvyPayments } from "../payments/curvy-payments.js";
 import type { PaymentLookup, Payments } from "../payments/payments.js";
 import { createShop } from "../shop.js";
 import { JsonFileRepository } from "../storage/json-file-repository.js";
+import { AGENT_PAY_TO, FakeAgentMerchant } from "./fake-agent-merchant.js";
+
+export { AGENT_PAY_TO, FakeAgentMerchant };
 
 const BABYJUBJUB_ORDER =
   2736030358979909402780800718157159386076813972158567259200215660948447373041n;
@@ -154,17 +157,28 @@ export async function testShop(overrides: Env = {}) {
   const signer: SignerSettings = settingsOrThrow(readSignerSettings(env));
   const repository = new JsonFileRepository();
   const payments = new FakePayments(settings);
+  const agentMerchant = new FakeAgentMerchant();
   const log = new MemoryLog();
 
   // Starts at real time: the SDK stamps each request's expiry from Date.now().
   let clock = Date.now();
 
-  const shop = createShop({ settings, signer, repository, payments, log, now: () => clock });
+  const shop = createShop({
+    settings,
+    signer,
+    repository,
+    payments,
+    agentStore: agentMerchant.store,
+    createMerchant: async () => agentMerchant,
+    log,
+    now: () => clock,
+  });
 
   return {
     env,
     shop,
     payments,
+    agentMerchant,
     repository,
     log,
     advance(ms: number) {
