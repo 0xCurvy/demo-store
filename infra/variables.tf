@@ -43,7 +43,7 @@ variable "environments" {
       curvy_environment  = "mainnet"
       curvy_api_url      = "https://api.curvy.box"
       checkout_url       = "https://app.curvy.box/checkout"
-      receiving_keys     = "01Q1JLFcflKpzdXgiNmbbd6WQtyyNUr6C2hWC1XTJi3KQ"
+      receiving_keys     = "01Q1JLFcflKpzdXgiNmbbd6WQtyyNUr6C2hWC1XTJi3KQ-fpcVXFxVYxca1yyURa2b-JG7xIvHO58IM8SltvpCMxgg0S9OArWvJjkNVhwY6Qa-DPA-1exKO85lYSgLvHE1_9fBGB8LqbOQxB06_THBCN3Vta9RxlUwVgvTwoG0iNeQRwYV6_f2YRIF4qMVIN8QPvL6xQZTU4ZjUOUMD6mUCNtlvChNGc4Y1LA4VE2WN4VA2Q_RyTjao6C_wx0mBvIWJnGygwMBGQ"
       chain_id           = "42161"
       tokens             = "USDC"
       aggregator_address = "0xCfFcFD5b1e082b3924CD7dD34A49c99ef080f953"
