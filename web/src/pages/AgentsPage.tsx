@@ -1,4 +1,4 @@
-import { AgentSamples } from "@/features/agents/components/AgentSamples";
+import { AgentPrompts } from "@/features/agents/components/AgentPrompts";
 import { useAgentCatalogue } from "@/features/agents/hooks/useAgentCatalogue";
 import { errorMessage } from "@/shared/api/client";
 import { formatPrice } from "@/shared/lib/money";
@@ -6,13 +6,11 @@ import { Notice } from "@/shared/ui/Notice";
 import { Sheet } from "@/shared/ui/Sheet";
 import { ShopLoader } from "@/shared/ui/ShopLoader";
 
-/** How an agent buys a wallpaper: the same pictures, paid over HTTP 402 instead of a checkout page. */
+/** How an agent buys a wallpaper: two prompts to paste into it, then what happens underneath. */
 export function AgentsPage() {
   const catalogue = useAgentCatalogue();
   const data = catalogue.data;
   const first = data?.resources[0];
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
-  const exact = data?.schemes.includes("exact") ?? false;
 
   return (
     <div className="space-y-16">
@@ -23,9 +21,9 @@ export function AgentsPage() {
         <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-end">
           <h1 className="text-6xl poster-title text-balance md:text-8xl">For agents</h1>
           <p className="max-w-md leading-relaxed text-ink-muted md:pb-3">
-            Every wallpaper here is also an HTTP resource an agent can buy on its own: ask for it,
-            get a 402, pay the one-time address in the answer, ask again. The money lands in the
-            shop&apos;s private Curvy balance, the same place human checkouts go.
+            Every wallpaper here is also something your agent can buy on its own. Two prompts below:
+            one gives the agent a wallet, one tells it how to buy. Copy, paste, done. The money
+            lands in the shop&apos;s private Curvy balance, the same place human checkouts go.
           </p>
         </div>
       </section>
@@ -66,8 +64,10 @@ export function AgentsPage() {
             )}
           </Sheet>
 
+          <AgentPrompts catalogue={data} />
+
           <section className="space-y-6">
-            <h2 className="text-4xl poster-title">How a purchase goes</h2>
+            <h2 className="text-4xl poster-title">What happens underneath</h2>
             <ol className="grid gap-6 md:grid-cols-2">
               {data.steps.map((step, index) => (
                 <li key={step} className="flex gap-4">
@@ -108,16 +108,6 @@ export function AgentsPage() {
               </table>
             </div>
           </section>
-
-          {first && (
-            <AgentSamples
-              origin={origin}
-              resource={first.url}
-              amount={first.amount}
-              symbol={data.asset.symbol}
-              exact={exact}
-            />
-          )}
 
           <Notice title="What the agent gets, and what it does not">
             One payment buys one download of one wallpaper, delivered as the body of the paid
