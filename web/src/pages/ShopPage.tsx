@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { HowItWorks } from "@/features/shop/components/HowItWorks";
 import { NetworkNote } from "@/features/shop/components/NetworkNote";
 import { ProductCard } from "@/features/shop/components/ProductCard";
@@ -24,9 +25,24 @@ export function ShopPage() {
           Curvy Payments demo
         </p>
         <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-end">
-          <h1 className="text-6xl poster-title text-balance md:text-8xl lg:text-9xl">
-            Brutalism in 4K
-          </h1>
+          <div>
+            <h1 className="text-6xl poster-title text-balance md:text-8xl lg:text-9xl">
+              Brutalism in 4K
+            </h1>
+            {/* The second line of the poster: the same face a size down, pointing agents to their own way in. */}
+            <Link
+              to="/agents"
+              className="group mt-4 inline-flex items-baseline gap-3 text-2xl poster-title text-ink transition-colors hover:text-sky-ink md:text-3xl"
+            >
+              <span aria-hidden="true">🤖</span>
+              <span className="underline decoration-sky decoration-4 underline-offset-8">
+                Or let your agent buy one over x402
+              </span>
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
+          </div>
           <p className="max-w-md leading-relaxed text-ink-muted md:pb-3">
             Wallpapers of Yugoslav towers, blocks and spomeniks. You see the thumbnail. Pay from
             your wallet on Curvy&apos;s checkout page, come back, and a link that works once
