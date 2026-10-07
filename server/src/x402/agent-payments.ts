@@ -30,7 +30,7 @@ export type AgentMerchant = Pick<
   | "minimumPrice"
   | "schemes"
   | "network"
-  | "token"
+  | "tokens"
 >;
 
 export interface AgentPaymentsDeps {
@@ -61,11 +61,12 @@ export function createAgentPayments(deps: AgentPaymentsDeps) {
     return {
       receivingKeys: settings.receivingKeys,
       rpcUrl: settings.rpcUrl,
-      token: settings.tokenAddress,
-      // The stack's portal broadcaster (and its facilitator) is the API gateway the shop already talks to.
-      broadcaster: settings.curvyApiUrl,
-      // Confirmation never depends on what the broadcaster advertises.
-      addresses: { aggregator: settings.aggregatorAddress },
+      tokens: [settings.tokenAddress],
+      // The Curvy stack: its contracts come from this API, and its portal broadcaster and facilitator sit behind it.
+      apiBaseUrl: settings.curvyApiUrl,
+      ...(settings.aggregatorAddress
+        ? { addresses: { aggregator: settings.aggregatorAddress } }
+        : {}),
       merchantOrigin: settings.merchantOrigin,
       confirmations: settings.confirmations,
       schemes,

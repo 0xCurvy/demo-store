@@ -194,7 +194,7 @@ export function createApp(deps: ShopDeps): App {
       settings: {
         chainId: settings.chainId,
         token: settings.tokenAddress,
-        aggregator: settings.aggregatorAddress,
+        aggregator: settings.aggregatorAddress ?? `From ${settings.curvyApiUrl}`,
         checkoutUrl: settings.checkoutUrl,
         merchantOrigin: settings.merchantOrigin,
         confirmations: settings.confirmations,

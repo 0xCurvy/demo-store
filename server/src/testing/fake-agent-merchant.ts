@@ -17,7 +17,14 @@ export const AGENT_PAY_TO = "0x1111111111111111111111111111111111111111" as cons
 export class FakeAgentMerchant implements AgentMerchant {
   readonly schemes = ["curvy-transfer"] as const;
   readonly network = "eip155:42161" as const;
-  readonly token = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" as const;
+  readonly tokens = [
+    {
+      address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      symbol: "USDC",
+      decimals: 6,
+      vaultTokenId: 2n,
+    },
+  ] as const;
   readonly charges: X402ChargeOptions[] = [];
   readonly store = createMemoryPaymentStore();
 
@@ -45,7 +52,7 @@ export class FakeAgentMerchant implements AgentMerchant {
         {
           scheme: "curvy-transfer",
           network: this.network,
-          asset: this.token,
+          asset: this.tokens[0].address,
           amount: options.price.toString(),
           payTo: AGENT_PAY_TO,
           maxTimeoutSeconds: 300,

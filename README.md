@@ -29,7 +29,7 @@ pnpm installs only package versions that have been public for at least a day, so
 The server starts even while `.env` is incomplete: the shop page lists what is still missing, so you can fill it in one value at a time, in the order the web app's Payments setup asks for them:
 
 1. **Website.** Set `MERCHANT_INTENT_SIGNING_KEY` and `MERCHANT_ORIGIN`. The shop now serves its signer list at `/.well-known/curvy-payments.json`, which the setup checks. The list also gives the shop's name and the icon checkout shows for it (`CHECKOUT_NAME` and `web/public/curvy-icon.png`, set in `server/src/payments/signer-list.ts`); checkout shows the shop's address beside the name. Replace them with your own name and a square PNG or WebP.
-2. **Backend.** Copy the `.env` block from the setup: `CURVY_PAYMENTS_PUBLIC_KEY`, `CHAIN_ID`, `TOKEN_ADDRESS`, `AGGREGATOR_ADDRESS`, `CHECKOUT_URL`. Add your `RPC_URL` and restart.
+2. **Backend.** Copy the `.env` block from the setup: `CURVY_PAYMENTS_PUBLIC_KEY`, `CURVY_API_URL` (staging), `TOKEN_ADDRESS`, `CHECKOUT_URL`. The SDK reads the stack's contracts from `CURVY_API_URL`. Add your `RPC_URL` and restart.
 3. **Test payment.** Buy something in the shop and pay it on Curvy checkout.
 
 Set `ADMIN_TOKEN` to see every order and payment attempt at <http://localhost:3100/admin>.
@@ -113,7 +113,7 @@ web/src/
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `CURVY_PAYMENTS_PUBLIC_KEY`                       | Your public key for payments, from Payments setup. It lets people pay you; it cannot spend your funds.  |
 | `MERCHANT_INTENT_SIGNING_KEY`                     | Secret. Signs checkout requests. Anyone holding it can redirect future payments.                        |
-| `CHAIN_ID`, `TOKEN_ADDRESS`, `AGGREGATOR_ADDRESS` | The network and token, from Payments setup.                                                             |
+| `CHAIN_ID`, `TOKEN_ADDRESS`, `AGGREGATOR_ADDRESS` | The network and token, from Payments setup; `AGGREGATOR_ADDRESS` only pins it.                          |
 | `CHECKOUT_URL`                                    | Curvy's checkout page.                                                                                  |
 | `MERCHANT_ORIGIN`                                 | This shop's own origin. Must be exactly where the shop is served.                                       |
 | `CURVY_API_URL`                                   | Curvy's API gateway: `https://api.curvy.box` (production) or `https://api.curvy.dev` (staging).         |

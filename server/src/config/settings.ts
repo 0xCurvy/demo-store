@@ -30,13 +30,16 @@ export interface ShopSettings {
   receivingKeys: string;
   signingKey: Hex;
   /** What the SDK's `initialize` takes: the environment, overrides and tokens as configured. */
-  sdk: Pick<PaymentSDKConfig, "environment" | "network" | "tokens">;
+  sdk: Pick<PaymentSDKConfig, "environment" | "apiBaseUrl" | "network" | "tokens">;
   /** Resolved by the SDK from `sdk`: the chain requests are made for. */
   chainId: number;
   /** Resolved by the SDK: the token the shop prices in (the first it takes). */
   tokenAddress: Address;
-  /** Resolved by the SDK: the aggregator payments are checked against. */
-  aggregatorAddress: Address;
+  /**
+   * AGGREGATOR_ADDRESS, the aggregator pinned for payments; null when the SDK reads the deployment's from
+   * `curvyApiUrl`, as the Curvy SDK does.
+   */
+  aggregatorAddress: Address | null;
   checkoutUrl: string;
   merchantOrigin: string;
   /** Curvy's API gateway for the stack, which also proxies the chain's JSON-RPC at /rpc/<chainId>. */
@@ -169,6 +172,8 @@ export function readShopSettings(env: Env): Settings<ShopSettings> {
 
   const sdk: ShopSettings["sdk"] = {
     environment: values.CURVY_ENVIRONMENT,
+    // The Curvy stack: the SDK reads its contracts from this API (production's or staging's).
+    apiBaseUrl: values.CURVY_API_URL,
     ...(values.CHAIN_ID === undefined
       ? {}
       : { network: { chainId: values.CHAIN_ID, aggregatorAddress: values.AGGREGATOR_ADDRESS } }),
@@ -176,7 +181,7 @@ export function readShopSettings(env: Env): Settings<ShopSettings> {
   };
 
   // The SDK resolves the network from the environment and the overrides, and refuses what it cannot serve.
-  let resolved: { chainId: number; tokenAddress: Address; aggregatorAddress: Address };
+  let resolved: { chainId: number; tokenAddress: Address; aggregatorAddress: Address | null };
 
   try {
     const instance = initialize({
@@ -193,14 +198,10 @@ export function readShopSettings(env: Env): Settings<ShopSettings> {
 
     if (!tokenAddress) throw new Error("TOKENS names no token Curvy takes on this network");
 
-    if (!instance.aggregatorAddress) {
-      throw new Error("AGGREGATOR_ADDRESS is required on a chain the SDK does not know");
-    }
-
     resolved = {
       chainId: instance.chainId,
       tokenAddress,
-      aggregatorAddress: instance.aggregatorAddress,
+      aggregatorAddress: instance.aggregatorAddress ?? null,
     };
   } catch (error) {
     return { ok: false, problems: [error instanceof Error ? error.message : String(error)] };

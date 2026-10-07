@@ -51,7 +51,7 @@ export function adminRoutes(state: ShopState, adminToken: string | null): Router
       settings: {
         chainId: settings.chainId,
         token: settings.tokenAddress,
-        aggregator: settings.aggregatorAddress,
+        aggregator: settings.aggregatorAddress ?? `From ${settings.curvyApiUrl}`,
         checkoutUrl: settings.checkoutUrl,
         merchantOrigin: settings.merchantOrigin,
         confirmations: settings.confirmations,

@@ -13,12 +13,12 @@ describe("shop settings", () => {
 
     if (!result.ok) return;
 
-    // Mainnet resolves to Curvy's Arbitrum One contracts and USDC first.
+    // Mainnet is Arbitrum One with USDC first; the aggregator comes from Curvy production's API at the first check.
     expect(result.value).toMatchObject({
-      sdk: { environment: "mainnet" },
+      sdk: { environment: "mainnet", apiBaseUrl: "https://api.curvy.box" },
       chainId: 42161,
       tokenAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-      aggregatorAddress: "0xE51924cEF003a654EC9735c4d97f5D4862cBcbB1",
+      aggregatorAddress: null,
       confirmations: 12,
       paidWhen: "shielded",
       completePath: "/checkout/complete",
