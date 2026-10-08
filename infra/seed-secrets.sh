@@ -69,11 +69,13 @@ seed_environment() { # seed_environment <environment> <env file> <signing key>
 production_key="$(value "$root/.env" MERCHANT_INTENT_SIGNING_KEY)"
 seed_environment production "$root/.env" "$production_key"
 
-# Development: its own signing key, generated here and kept nowhere but GitHub.
-dev_signer="$(mktemp)"
+# Development: its own signing key, generated here and kept nowhere but GitHub. create-signer refuses a path
+# that already exists, so it gets a fresh name inside a temporary directory rather than a file mktemp made.
+dev_signer_dir="$(mktemp -d)"
+trap 'rm -rf "$dev_signer_dir"' EXIT
+dev_signer="$dev_signer_dir/signer.json"
 (cd "$root/server" && pnpm exec curvy-payments create-signer --out "$dev_signer" >/dev/null)
 development_key="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["privateKey"])' "$dev_signer")"
-rm -f "$dev_signer"
 seed_environment development "${dev_env_file:-$root/.env}" "$development_key"
 
 echo

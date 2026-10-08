@@ -42,6 +42,21 @@ jobs:
           workingDirectory: worker
           environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
           command: d1 migrations apply ORDERS --remote
+      # The Curvy stack, receiving keys and network are public and live in wrangler.toml; only these are secrets.
+      # RPC_URL is optional (without it the shop reads the chain through Curvy's gateway proxy), and wrangler-action
+      # fails on a listed secret with an empty value, so it is only listed when the environment has one.
+      - name: Choose the secrets to sync
+        id: secrets
+        env:
+          RPC_URL: ${{ secrets.RPC_URL }}
+        run: |
+          {
+            echo 'list<<EOF'
+            echo MERCHANT_INTENT_SIGNING_KEY
+            echo ADMIN_TOKEN
+            if [ -n "$RPC_URL" ]; then echo RPC_URL; fi
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
       - name: Deploy the Worker and sync its secrets
         uses: cloudflare/wrangler-action@v3
         with:
@@ -51,12 +66,7 @@ jobs:
           workingDirectory: worker
           environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
           command: deploy
-          # The Curvy stack, receiving keys and network are public and live in wrangler.toml; only these are secrets.
-          # RPC_URL is optional: without it the shop reads the chain through Curvy's gateway proxy.
-          secrets: |
-            MERCHANT_INTENT_SIGNING_KEY
-            RPC_URL
-            ADMIN_TOKEN
+          secrets: ${{ steps.secrets.outputs.list }}
         env:
           MERCHANT_INTENT_SIGNING_KEY: ${{ secrets.MERCHANT_INTENT_SIGNING_KEY }}
           RPC_URL: ${{ secrets.RPC_URL }}
